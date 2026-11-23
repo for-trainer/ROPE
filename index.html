@@ -1,0 +1,2545 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ТЯНИ! — тренажёр таблицы умножения 5–9</title>
+<meta name="description" content="Командный тренажёр по таблице умножения 5–9: две команды перетягивают канат, решая примеры одновременно.">
+<meta name="theme-color" content="#17231C">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2317231C'/%3E%3Cpath d='M16 44c0-11 11-14 19-8s19 3 19-8' stroke='%23F6C445' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='44' r='6' fill='%23EE5F2B'/%3E%3Ccircle cx='54' cy='28' r='6' fill='%23EE5F2B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style>
+:root{
+  --paper:#F4EFE4;
+  --paper-deep:#ECE4D4;
+  --surface:#FFFCF5;
+  --ink:#17231C;
+  --ink-soft:#58645B;
+  --line:#DCD2BF;
+  --line-dark:#C8BCA5;
+  --orange:#EE5F2B;
+  --orange-deep:#C64719;
+  --orange-soft:#FBE3D5;
+  --teal:#177E70;
+  --teal-deep:#0D5D52;
+  --teal-soft:#DCEFE9;
+  --yellow:#F6C445;
+  --yellow-soft:#FBF0C6;
+  --green:#1D7A52;
+  --green-soft:#E1F2E6;
+  --red:#C33C27;
+  --red-soft:#FBE2DC;
+  --shadow-card:5px 6px 0 rgba(23,35,28,.11);
+  --radius:22px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+#match,#protocolSection,#matchBoard{scroll-margin-top:82px}
+body{
+  margin:0;
+  color:var(--ink);
+  font-family:'Manrope',system-ui,-apple-system,sans-serif;
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(circle at 8% -8%, rgba(246,196,69,.30), transparent 34%),
+    radial-gradient(circle at 96% 4%, rgba(23,126,112,.13), transparent 30%),
+    linear-gradient(90deg, rgba(23,35,28,.032) 1px, transparent 1px),
+    linear-gradient(rgba(23,35,28,.028) 1px, transparent 1px);
+  background-size:auto,auto,58px 58px,58px 58px;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+body.modal-open{overflow:hidden}
+button,input{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.display{font-family:'Unbounded','Manrope',sans-serif}
+.eyebrow{font-size:9.5px;line-height:1.3;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+
+/* ===== HEADER ===== */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  background:rgba(244,239,228,.88);
+  border-bottom:1.5px solid rgba(23,35,28,.20);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.topbar-inner{max-width:1320px;margin:0 auto;padding:11px 24px;min-height:66px;display:flex;align-items:center;gap:24px}
+.brand{display:flex;align-items:center;gap:11px;color:inherit;text-decoration:none;flex:none}
+.brand-mark{
+  width:42px;height:42px;border-radius:13px;background:var(--ink);
+  display:grid;place-items:center;transform:rotate(-3deg);
+  box-shadow:2px 3px 0 rgba(238,95,43,.85);
+}
+.brand-mark svg{width:27px;height:27px;display:block}
+.brand-copy b{display:block;font-family:'Unbounded',sans-serif;font-size:19px;font-weight:800;line-height:1;letter-spacing:.01em}
+.brand-copy small{display:block;margin-top:5px;font-size:9.5px;line-height:1;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.match-tag{
+  margin:0 auto;display:flex;align-items:center;gap:8px;
+  padding:8px 13px;border:1px solid var(--line);border-radius:999px;
+  background:rgba(255,252,245,.72);
+  font-size:9.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#455249;
+  white-space:nowrap;
+}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 3px rgba(238,95,43,.15);animation:blink 2.2s ease-in-out infinite}
+.match-tag .slash{color:var(--line-dark)}
+.top-actions{display:flex;align-items:center;gap:8px;flex:none}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line-dark);
+  background:var(--surface);color:var(--ink);display:grid;place-items:center;
+  transition:transform .16s ease, background .16s ease, box-shadow .16s ease;
+}
+.icon-btn:hover{transform:translateY(-1px);background:#fff;box-shadow:0 3px 0 rgba(23,35,28,.13)}
+.icon-btn svg{width:17px;height:17px}
+.icon-btn.is-muted{color:var(--ink-soft);background:#EFE9DC}
+.icon-btn .sound-wave{transition:opacity .15s}
+.icon-btn.is-muted .sound-wave{opacity:0}
+#soundSlash{display:none}
+.icon-btn.is-muted #soundSlash{display:block}
+.icon-btn:not(.is-muted) #soundSlash{display:none}
+.text-btn{
+  border:0;background:transparent;color:var(--ink);
+  padding:8px 7px;font-size:12px;font-weight:800;
+  border-radius:8px;transition:background .15s;
+}
+.text-btn:hover{background:rgba(255,252,245,.8)}
+.mobile-settings{display:none}
+.primary-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:1.5px solid var(--ink);border-radius:999px;
+  background:var(--ink);color:#fff;padding:11px 17px;
+  font-size:12px;font-weight:800;letter-spacing:.01em;
+  box-shadow:2px 3px 0 rgba(238,95,43,.85);
+  transition:transform .16s ease, box-shadow .16s ease;
+  text-decoration:none;
+}
+.primary-btn:hover{transform:translate(-1px,-1px);box-shadow:3px 4px 0 rgba(238,95,43,.9)}
+.primary-btn:active{transform:translate(1px,2px);box-shadow:0 1px 0 rgba(238,95,43,.85)}
+.primary-btn svg{width:14px;height:14px}
+.primary-btn.is-inverse{background:var(--surface);color:var(--ink);box-shadow:2px 3px 0 rgba(246,196,69,.9)}
+.primary-btn.is-team{background:var(--team,var(--orange));border-color:var(--ink);box-shadow:2px 3px 0 var(--ink)}
+
+/* ===== PAGE / HEADING ===== */
+.app{max-width:1320px;margin:0 auto;padding:22px 24px 0;position:relative;z-index:2}
+.heading-row{display:flex;align-items:flex-end;justify-content:space-between;gap:34px;margin:0 0 18px}
+.heading-main{min-width:0}
+.heading-row h1{
+  margin:6px 0 0;max-width:820px;
+  font-family:'Unbounded',sans-serif;font-size:clamp(28px,3.25vw,44px);
+  line-height:1.04;font-weight:700;letter-spacing:-.045em;
+}
+.heading-row h1 .accent{color:var(--orange);position:relative;display:inline-block;z-index:0}
+.heading-row h1 .accent::after{
+  content:"";position:absolute;left:-2px;right:-4px;bottom:.01em;height:.23em;
+  background:var(--yellow);border-radius:2px;z-index:-1;transform:rotate(-1.4deg);
+}
+.heading-row h1 .dot{color:var(--teal)}
+.lede{
+  flex:none;width:295px;margin:0 0 4px;padding-left:14px;
+  border-left:2px solid var(--orange);
+  color:var(--ink-soft);font-size:12px;line-height:1.6;font-weight:600;
+}
+.lede b{color:var(--ink);font-weight:800}
+
+/* ===== MATCH BOARD ===== */
+.match-board{
+  position:relative;overflow:hidden;
+  background:var(--surface);
+  border:1.5px solid var(--ink);border-radius:23px;
+  box-shadow:6px 7px 0 rgba(23,35,28,.12);
+}
+.board-strip{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:7px 18px;background:var(--ink);color:#F8F3E7;
+  font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;
+}
+.board-strip .strip-side{display:flex;align-items:center;gap:7px}
+.board-strip .strip-center{color:var(--yellow);letter-spacing:.19em}
+.signal{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 3px rgba(238,95,43,.2);animation:blink 2s infinite}
+.score-row{display:grid;grid-template-columns:minmax(0,1fr) 325px minmax(0,1fr);align-items:stretch;min-height:112px;border-bottom:1.5px solid var(--ink)}
+.team-block{display:flex;align-items:center;gap:13px;padding:13px 18px;min-width:0;position:relative;overflow:hidden}
+.team-block::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.9}
+.team-left{--team:var(--orange)}
+.team-right{--team:var(--teal)}
+.team-left::before{background:linear-gradient(112deg, var(--orange-soft) 0%, rgba(251,227,213,.35) 55%, transparent 88%)}
+.team-right::before{background:linear-gradient(248deg, var(--teal-soft) 0%, rgba(220,239,233,.35) 55%, transparent 88%)}
+.team-block>*{position:relative;z-index:1}
+.team-right{flex-direction:row-reverse;text-align:right}
+.team-badge{
+  width:56px;height:56px;border:1.5px solid var(--ink);border-radius:17px;
+  display:grid;place-items:center;flex:none;
+  box-shadow:2px 3px 0 rgba(23,35,28,.20);
+}
+.team-badge.badge-a{background:var(--orange);color:#fff;transform:rotate(-3deg)}
+.team-badge.badge-b{background:var(--teal);color:#fff;transform:rotate(3deg)}
+.team-badge svg{width:29px;height:29px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.team-ident{min-width:0}
+.team-kicker{font-size:8.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft);display:block}
+.team-name{
+  font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;
+  line-height:1.14;margin:3px 0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;
+}
+.streak{display:flex;align-items:center;gap:4px;font-size:10px;line-height:1.2;font-weight:700;color:#7C7A6E;white-space:nowrap}
+.team-right .streak{justify-content:flex-end}
+.streak svg{width:11px;height:11px;fill:currentColor;stroke:none}
+.streak.has-streak{color:var(--orange-deep)}
+.team-right .streak.has-streak{color:var(--teal-deep)}
+.team-score{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;line-height:1}
+.team-right .team-score{margin-left:0;margin-right:auto;align-items:flex-start}
+.score-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:36px;letter-spacing:-.05em;line-height:1}
+.score-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-top:5px}
+.match-center{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto 1fr;
+  align-items:center;column-gap:11px;row-gap:4px;
+  width:325px;padding:10px 13px;
+  background:linear-gradient(180deg,#FFFDF7,#F7F0E2);
+  border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);
+  min-width:0;
+}
+.phase-pill{
+  grid-column:1/-1;justify-self:start;
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 7px;border-radius:5px;background:#ECE4D5;color:#4D5A50;
+  font-size:8px;line-height:1.4;font-weight:800;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+}
+.phase-pill .phase-dot{width:5px;height:5px;border-radius:50%;background:#708073;flex:none}
+.phase-pill.live{background:var(--green-soft);color:var(--green)}
+.phase-pill.live .phase-dot{background:var(--green);animation:blink 1.4s infinite}
+.phase-pill.paused{background:var(--yellow-soft);color:#755809}
+.phase-pill.paused .phase-dot{background:#A67E18}
+.phase-pill.checking{background:var(--orange-soft);color:var(--orange-deep)}
+.phase-pill.checking .phase-dot{background:var(--orange)}
+.timer-ring{position:relative;width:66px;height:66px;flex:none;display:grid;place-items:center;grid-row:2}
+.timer-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ring-track{fill:none;stroke:#E7DECC;stroke-width:5}
+.ring-progress{fill:none;stroke:var(--orange);stroke-width:5;stroke-linecap:round;stroke-dasharray:163.4;stroke-dashoffset:0;transition:stroke-dashoffset .2s linear, stroke .25s ease}
+.timer-value{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.timer-value b{font-family:'Unbounded',sans-serif;font-size:19px;font-weight:700;letter-spacing:-.05em}
+.timer-value small{margin-top:2px;font-size:6.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.timer-ring.is-critical .ring-progress{stroke:var(--red)}
+.timer-ring.is-critical{animation:softPulse 1s ease-in-out infinite}
+.timer-ring.is-paused .ring-progress{stroke:var(--yellow)}
+.center-copy{min-width:0;grid-row:2;display:flex;flex-direction:column;align-items:flex-start}
+.center-copy strong{font-family:'Unbounded',sans-serif;font-size:12px;line-height:1.25;font-weight:600;letter-spacing:-.01em}
+.center-copy>span{display:block;margin-top:2px;font-size:9px;line-height:1.35;font-weight:600;color:var(--ink-soft);max-width:180px}
+.start-btn{
+  margin-top:5px;min-height:26px;width:100%;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  padding:4px 8px;border:1.5px solid var(--ink);border-radius:7px;
+  color:#fff;background:var(--orange);font-size:10px;font-weight:800;
+  box-shadow:1.5px 2px 0 var(--ink);
+  transition:transform .14s ease, box-shadow .14s ease;
+}
+.start-btn:hover{transform:translate(-1px,-1px);box-shadow:2px 3px 0 var(--ink)}
+.start-btn:active{transform:translate(1px,1px);box-shadow:none}
+.start-btn svg{width:9px;height:9px;fill:currentColor}
+.match-number{font-family:'Unbounded',sans-serif;letter-spacing:.02em}
+
+/* ===== ARENA ===== */
+.arena{position:relative;background:#EFE3CC;overflow:hidden;--lead:var(--yellow)}
+.arena::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(23,35,28,.07) .7px, transparent .7px);
+  background-size:14px 14px;opacity:.35;
+}
+.arena-top{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 17px 1px}
+.arena-label{font-size:8.5px;line-height:1.3;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:#7A7461;white-space:nowrap;min-width:0;overflow:hidden}
+.arena-label b{color:var(--orange-deep);font-weight:800;display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+.arena-label.is-right b{color:var(--teal-deep)}
+.arena-label.is-right{text-align:right}
+.tug-caption{
+  display:inline-flex;align-items:center;gap:6px;text-align:center;
+  padding:4px 10px;border:1px solid rgba(23,35,28,.16);border-radius:999px;
+  background:rgba(255,252,245,.80);backdrop-filter:blur(4px);
+  font-size:9px;line-height:1.3;font-weight:800;letter-spacing:.03em;color:var(--ink);
+  max-width:54%;
+}
+.tug-caption::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lead);flex:none;border:1px solid rgba(23,35,28,.35)}
+.arena-stage{position:relative;z-index:1;line-height:0}
+#tugSvg{display:block;width:100%;height:auto;min-height:100px;overflow:hidden}
+.scene-bg{fill:#EFE3CC}
+.scene-shade{fill:url(#arenaShade)}
+.ground-line{stroke:#17231C;stroke-width:2;opacity:.42}
+.center-guide{stroke:#8F846D;stroke-width:1.5;stroke-dasharray:5 7;opacity:.55}
+.goal-guide{stroke-dasharray:5 7;stroke-width:2;opacity:.42}
+.goal-flag{stroke:#17231C;stroke-width:2;stroke-linejoin:round}
+.goal-text{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;fill:#17231C}
+.field-tick{stroke:#9C9078;stroke-width:2;opacity:.6;stroke-linecap:round}
+.field-tick.is-major{stroke:#17231C;stroke-width:3;opacity:.8}
+.rope-under{fill:none;stroke:#8C5C34;stroke-width:12;stroke-linecap:round}
+.rope-top{fill:none;stroke:#C89868;stroke-width:6.5;stroke-linecap:round}
+.rope-twist{fill:none;stroke:#8C5C34;stroke-width:1.7;stroke-dasharray:5 11;opacity:.7;stroke-linecap:round}
+.rope-shadow{fill:none;stroke:rgba(23,35,28,.13);stroke-width:17;stroke-linecap:round;transform:translateY(6px)}
+.knot-move{transition:transform .72s cubic-bezier(.22,1.12,.36,1);transform:translateX(0px)}
+.knot-body{fill:#F6C445;stroke:#17231C;stroke-width:2.6}
+.knot-tail{fill:var(--lead);stroke:#17231C;stroke-width:2.2;stroke-linejoin:round;transition:fill .3s}
+.knot-dot{fill:#17231C}
+.jersey{fill:currentColor;stroke:#17231C;stroke-width:2.4;stroke-linejoin:round}
+.skin{fill:#F0C39B;stroke:#17231C;stroke-width:2.2}
+.skin-arm{stroke:#F0C39B;stroke-width:9;stroke-linecap:round;fill:none}
+.shorts{fill:#22362C;stroke:#17231C;stroke-width:2.2;stroke-linejoin:round}
+.shoe{fill:#17231C;stroke:#17231C;stroke-width:3;stroke-linecap:round}
+.hair{fill:#3B2A20}
+.band{fill:#FFFCF5;stroke:#17231C;stroke-width:1.6}
+.eye{fill:#17231C}
+.mouth{fill:none;stroke:#17231C;stroke-width:1.6;stroke-linecap:round}
+.cheek{fill:#E9A17B;opacity:.55}
+.dust{fill:#CFC1A9;opacity:.75}
+.arena.is-lead-a{--lead:var(--orange)}
+.arena.is-lead-b{--lead:var(--teal)}
+.arena-bottom{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:1px 17px 9px}
+.arena-legend{display:flex;align-items:center;gap:11px;font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7D7664}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:7px;height:7px;border-radius:50%;border:1px solid var(--ink)}
+.legend-dot.a{background:var(--orange)}
+.legend-dot.b{background:var(--teal)}
+.legend-vs{font-family:'Unbounded',sans-serif;font-size:8px;letter-spacing:0;color:#9B927E}
+.pause-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  border:1px solid var(--line-dark);border-radius:999px;background:rgba(255,252,245,.72);
+  padding:4px 9px;font-size:8.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#4C594F;
+  transition:background .15s, border-color .15s;
+}
+.pause-btn svg{width:9px;height:9px;fill:currentColor}
+.pause-btn:hover:not(:disabled){background:#fff;border-color:var(--ink-soft)}
+.pause-btn:disabled{opacity:.4;cursor:not-allowed}
+.pause-curtain{
+  position:absolute;inset:28px 0 30px;z-index:5;display:flex;align-items:center;justify-content:center;
+  background:rgba(244,239,228,.65);backdrop-filter:blur(3px);
+  pointer-events:none;
+}
+.pause-curtain span{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 14px;
+  background:var(--ink);color:#fff;border-radius:999px;
+  font-family:'Unbounded',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;
+  box-shadow:3px 4px 0 rgba(238,95,43,.8);
+}
+.pull-burst{
+  position:absolute;top:38%;z-index:6;transform:translate(-50%,0);
+  display:flex;flex-direction:column;align-items:center;line-height:1;
+  font-family:'Unbounded',sans-serif;font-size:22px;font-weight:800;color:var(--team,var(--orange-deep));
+  text-shadow:0 2px 0 #FFFCF5, 0 0 16px rgba(255,252,245,.9);
+  pointer-events:none;animation:floatUp 1.4s ease-out forwards;
+}
+.pull-burst small{font-family:'Manrope',sans-serif;font-size:8px;letter-spacing:.08em;text-transform:uppercase;margin-top:3px;font-weight:800}
+.pull-burst.is-a{color:var(--orange-deep)}
+.pull-burst.is-b{color:var(--teal-deep)}
+.pull-burst.is-zero{color:var(--ink-soft);font-size:14px}
+
+/* ===== PLAY GRID ===== */
+.play-grid{
+  display:grid;grid-template-columns:minmax(0,1fr) 218px minmax(0,1fr);
+  gap:14px;margin-top:14px;align-items:stretch;
+}
+.answer-card{
+  --team:var(--orange);--team-deep:var(--orange-deep);--team-soft:var(--orange-soft);
+  position:relative;display:flex;flex-direction:column;min-width:0;overflow:hidden;
+  background:var(--surface);border:1.5px solid var(--ink);border-radius:20px;
+  box-shadow:4px 5px 0 rgba(23,35,28,.10);
+  transition:box-shadow .18s ease, transform .18s ease;
+}
+.answer-card.team-b{--team:var(--teal);--team-deep:var(--teal-deep);--team-soft:var(--teal-soft)}
+.answer-card.is-active{box-shadow:4px 5px 0 var(--team)}
+.answer-card.is-wrong{animation:shake .4s ease}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 12px;background:var(--team-soft);
+  border-bottom:1.5px solid var(--ink);
+}
+.card-team{display:flex;align-items:center;gap:7px;min-width:0}
+.jersey-dot{
+  width:24px;height:24px;flex:none;border:1.3px solid var(--ink);border-radius:8px;
+  background:var(--team);color:#fff;display:grid;place-items:center;
+  font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;
+  box-shadow:1px 2px 0 rgba(23,35,28,.2);
+}
+.card-team b{font-size:11.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.kbd-hint{
+  display:none;font-size:8px;font-weight:800;letter-spacing:.06em;
+  border:1px solid rgba(23,35,28,.22);border-radius:4px;padding:2px 4px;color:var(--ink-soft);
+}
+.answer-card.is-active .kbd-hint{display:inline-block;background:rgba(255,252,245,.6)}
+.status-chip{
+  display:inline-flex;align-items:center;gap:4px;white-space:nowrap;
+  padding:3px 7px;border-radius:999px;border:1px solid rgba(23,35,28,.2);
+  background:rgba(255,252,245,.72);
+  font-size:8px;line-height:1.4;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#4A574E;
+}
+.status-chip::before{content:"";width:5px;height:5px;border-radius:50%;background:#7A867D;flex:none}
+.status-chip.chip-good{background:var(--green-soft);color:var(--green);border-color:#A7CEB2}
+.status-chip.chip-good::before{background:var(--green)}
+.status-chip.chip-bad{background:var(--red-soft);color:var(--red);border-color:#E6B2A6}
+.status-chip.chip-bad::before{background:var(--red)}
+.status-chip.chip-active{background:#FFFCF5;color:var(--team-deep);border-color:var(--team)}
+.status-chip.chip-active::before{background:var(--team);animation:blink 1.4s infinite}
+.status-chip.chip-neutral{background:var(--yellow-soft);color:#6D550D;border-color:#E5D39A}
+.status-chip.chip-neutral::before{background:#B39135}
+.card-body{display:grid;grid-template-columns:minmax(0,1fr) 176px;gap:10px;padding:12px;flex:1}
+.question-pane{display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+.q-label{font-size:8px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#8A8A7B;display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.q-label::before{content:"";width:14px;height:1.5px;background:var(--team);display:block;border-radius:2px}
+.expression{
+  font-family:'Unbounded',sans-serif;font-size:clamp(26px,2.55vw,35px);
+  font-weight:700;line-height:1.05;letter-spacing:-.06em;white-space:nowrap;
+  margin:2px 0 7px;color:var(--ink);
+}
+.expression .times{color:var(--team);font-weight:600}
+.eq-row{display:flex;align-items:center;gap:7px;min-width:0}
+.eq-sign{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:600;color:#8B8577;flex:none;line-height:1}
+.answer-slot{
+  height:54px;min-width:74px;max-width:106px;flex:1;
+  display:grid;place-items:center;padding:0 7px;
+  border:1.5px dashed var(--line-dark);border-radius:11px;
+  background:#F8F3E8;color:var(--ink);
+  font-family:'Unbounded',sans-serif;font-size:26px;font-weight:700;line-height:1;letter-spacing:-.03em;
+  transition:background .18s,border-color .18s,color .18s;
+}
+.answer-slot.is-filled{border-style:solid;border-color:var(--ink);background:#fff}
+.answer-slot.good{border-style:solid;border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.answer-slot.bad{border-style:solid;border-color:var(--red);background:var(--red-soft);color:var(--red)}
+.feedback{font-size:9.5px;line-height:1.45;font-weight:600;color:#747D74;margin-top:7px;min-height:27px;max-width:95%}
+.feedback strong{color:var(--ink);font-weight:800}
+.feedback .green{color:var(--green);font-weight:800}
+.feedback .red{color:var(--red);font-weight:800}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;align-content:center}
+.key{
+  height:37px;min-width:0;border:1.2px solid var(--line);border-radius:8px;
+  background:#FBF7EE;color:var(--ink);
+  font-size:15px;font-weight:800;line-height:1;
+  transition:transform .1s ease, background .12s ease, border-color .12s ease, box-shadow .12s;
+}
+.key:hover:not(:disabled){background:var(--team-soft);border-color:var(--team);transform:translateY(-1px)}
+.key:active:not(:disabled){transform:translateY(1px)}
+.key--del{font-size:12px;color:#758076;font-weight:800}
+.key--ok{
+  background:var(--team);border:1.2px solid var(--ink);color:#fff;
+  box-shadow:1px 1.5px 0 rgba(23,35,28,.5);font-size:14px;
+}
+.key--ok:hover:not(:disabled){background:var(--team-deep);border-color:var(--ink)}
+.key:disabled{opacity:.52;cursor:not-allowed;box-shadow:none}
+.key--ok:disabled{opacity:.6}
+.card-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  padding:6px 12px;border-top:1px dashed var(--line);
+  font-size:8px;font-weight:700;letter-spacing:.02em;color:#9A9789;
+}
+.card-foot span{display:flex;align-items:center;gap:4px}
+.card-foot svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* === RULES COLUMN === */
+.rules-panel{
+  position:relative;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--ink);color:#F6F1E4;border:1.5px solid var(--ink);border-radius:20px;
+  padding:14px 15px;box-shadow:4px 5px 0 rgba(23,35,28,.12);
+}
+.rules-panel::before{
+  content:"VS";position:absolute;right:-8px;bottom:37px;
+  font-family:'Unbounded',sans-serif;font-size:82px;font-weight:800;line-height:1;
+  color:rgba(255,252,245,.045);letter-spacing:-.08em;pointer-events:none;
+}
+.rules-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.vs-badge{
+  width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+  background:var(--yellow);color:var(--ink);border:1.5px solid #FFFCF5;
+  font-family:'Unbounded',sans-serif;font-size:12px;font-weight:800;
+  transform:rotate(-4deg);box-shadow:2px 2px 0 rgba(238,95,43,.85);flex:none;
+}
+.rules-panel .eyebrow{color:#AFAE9E;font-size:8px;letter-spacing:.12em;text-align:right;line-height:1.5}
+.rules-panel h3{position:relative;z-index:1;font-family:'Unbounded',sans-serif;font-size:14px;line-height:1.35;font-weight:600;letter-spacing:-.03em;margin:9px 0 8px;color:#FCF7EC}
+.rules-list{position:relative;z-index:1;list-style:none;margin:0;padding:0}
+.rules-list li{display:flex;align-items:center;gap:7px;padding:5px 0;font-size:9px;line-height:1.35;font-weight:600;color:#CFCABA;border-bottom:1px dashed rgba(255,252,245,.13)}
+.rules-list li:last-child{border-bottom:0}
+.rule-icon{
+  flex:none;width:22px;height:19px;border-radius:5px;display:grid;place-items:center;
+  font-size:8.5px;font-weight:800;line-height:1;letter-spacing:-.02em;
+}
+.rule-icon.plus{background:rgba(94,187,137,.16);color:#93D9B4;border:1px solid rgba(147,217,180,.35)}
+.rule-icon.minus{background:rgba(238,95,43,.15);color:#FFAD8B;border:1px solid rgba(255,173,139,.3)}
+.rule-icon.speed{background:rgba(246,196,69,.14);color:var(--yellow);border:1px solid rgba(246,196,69,.32);font-size:10px}
+.rule-icon.flag{background:rgba(255,252,245,.10);color:#FFFCF5;border:1px solid rgba(255,252,245,.25);font-size:10px}
+.rule-icon.goal{background:rgba(255,252,245,.10);color:#FFFCF5;border:1px solid rgba(255,252,245,.25);font-size:10px}
+.rules-list b{color:#FFFCF5;font-weight:800}
+.rules-tip{margin:7px 0 0;font-size:8px;line-height:1.45;color:#969D91;position:relative;z-index:1}
+.rules-foot{margin-top:auto;padding-top:9px;position:relative;z-index:1}
+.pause-btn--wide{
+  width:100%;justify-content:center;padding:7px 9px;
+  background:transparent;border:1px solid rgba(255,252,245,.28);color:#F7F1E3;
+  font-size:9px;letter-spacing:.08em;
+}
+.pause-btn--wide:hover:not(:disabled){background:rgba(255,252,245,.11);border-color:rgba(255,252,245,.55)}
+.pause-btn--wide:disabled{opacity:.4}
+
+/* ===== PROTOCOL ===== */
+.protocol{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;margin-top:16px}
+.panel{
+  background:rgba(255,252,245,.75);border:1.5px solid var(--line-dark);border-radius:20px;
+  padding:14px 16px;min-width:0;
+}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.panel-head h2{font-family:'Unbounded',sans-serif;font-size:13px;line-height:1.25;font-weight:600;letter-spacing:-.02em;margin:3px 0 0}
+.panel-head .eyebrow{font-size:8px}
+.panel-meta{font-size:8px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8F9183;white-space:nowrap;text-align:right;line-height:1.5}
+.round-log{display:flex;flex-wrap:wrap;gap:5px;min-height:65px;align-content:flex-start}
+.log-empty{
+  flex:1;min-height:60px;display:flex;align-items:center;justify-content:center;gap:8px;
+  border:1px dashed var(--line-dark);border-radius:10px;padding:10px;
+  font-size:9.5px;line-height:1.4;font-weight:600;color:#989689;text-align:center;
+}
+.log-empty svg{width:17px;height:17px;stroke:#B3AB97;fill:none;stroke-width:1.7;stroke-linecap:round;flex:none}
+.log-item{
+  display:flex;align-items:center;gap:4px;
+  padding:5px 6px;border:1px solid var(--line);border-radius:7px;background:#FFFCF5;
+  font-size:8.5px;font-weight:800;line-height:1;
+}
+.log-item.is-latest{border-color:var(--ink);box-shadow:1px 1.5px 0 rgba(23,35,28,.14)}
+.log-round{color:#9C9A8B;font-size:7px;letter-spacing:.03em}
+.log-expr{font-family:'Unbounded',sans-serif;font-size:7.5px;font-weight:600;letter-spacing:-.02em;color:#37463C;margin-right:1px}
+.log-mark{
+  width:13px;height:13px;border-radius:4px;display:grid;place-items:center;
+  font-size:7.5px;font-weight:800;
+}
+.log-mark.ok{background:var(--green-soft);color:var(--green)}
+.log-mark.bad{background:var(--red-soft);color:var(--red)}
+.log-mark.is-a{box-shadow:inset 0 -2px 0 var(--orange)}
+.log-mark.is-b{box-shadow:inset 0 -2px 0 var(--teal)}
+.log-delta{font-size:7.5px;color:#7B7E73;margin-left:1px;min-width:12px;text-align:right}
+.log-delta.is-a{color:var(--orange-deep)}
+.log-delta.is-b{color:var(--teal-deep)}
+.log-delta.is-zero{color:#A6A290}
+.log-legend{display:flex;align-items:center;gap:9px;margin-top:8px;font-size:7.5px;font-weight:700;color:#9A9789;text-transform:uppercase;letter-spacing:.05em}
+.log-legend span{display:flex;align-items:center;gap:4px}
+.legend-square{width:7px;height:7px;border-radius:2px}
+.legend-square.a{background:var(--orange)}
+.legend-square.b{background:var(--teal)}
+.stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.stat-card{background:#FFFCF5;border:1px solid var(--line);border-radius:10px;padding:7px 9px;min-width:0}
+.stat-label{display:block;font-size:7.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#929486;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.stat-values{display:flex;align-items:baseline;gap:5px;font-family:'Unbounded',sans-serif;line-height:1}
+.stat-values b{font-size:15px;font-weight:700;letter-spacing:-.04em}
+.stat-values b.is-a{color:var(--orange-deep)}
+.stat-values b.is-b{color:var(--teal-deep)}
+.stat-values .colon{font-size:9px;color:#B3AE9F;font-weight:600}
+.stat-values small{font-family:'Manrope',sans-serif;font-size:7px;letter-spacing:.02em;font-weight:700;color:#9A9B8D;margin-left:auto;white-space:nowrap}
+.proto-note{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:7.5px;line-height:1.4;color:#9A9B8D}
+.proto-note svg{width:11px;height:11px;stroke:#B2AC99;fill:none;stroke-width:1.6;stroke-linecap:round;flex:none}
+
+/* ===== FOOTER ===== */
+.site-footer{
+  max-width:1320px;margin:14px auto 0;padding:16px 24px 28px;
+  border-top:1.5px solid rgba(23,35,28,.13);
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  color:#868B7F;font-size:9.5px;line-height:1.55;position:relative;z-index:2;
+}
+.footer-brand{display:flex;align-items:center;gap:7px;font-weight:800;color:var(--ink);flex:none}
+.footer-brand .mini-knot{width:21px;height:21px;border-radius:6px;background:var(--ink);display:grid;place-items:center}
+.footer-brand svg{width:13px;height:13px}
+.site-footer p{margin:0;max-width:520px}
+.footer-links{display:flex;gap:12px;flex:none}
+.footer-links button{border:0;background:none;padding:2px 0;color:#646E65;font-size:9px;font-weight:800;letter-spacing:.03em;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#B7AF9F}
+.footer-links button:hover{color:var(--ink);text-decoration-color:var(--orange)}
+
+/* ===== MODALS ===== */
+.modal{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:18px}
+.modal-backdrop{position:absolute;inset:0;background:rgba(23,35,28,.58);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);animation:fadeIn .18s ease}
+.modal-card{
+  position:relative;z-index:1;width:min(720px,100%);max-height:calc(100vh - 36px);
+  overflow:auto;overscroll-behavior:contain;
+  background:var(--surface);border:1.5px solid var(--ink);border-radius:23px;
+  box-shadow:9px 11px 0 rgba(23,35,28,.24);
+  animation:modalIn .25s cubic-bezier(.2,.9,.3,1.1);
+}
+.modal-card.is-narrow{width:min(560px,100%)}
+.modal-head{
+  position:sticky;top:0;z-index:2;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+  padding:18px 20px;border-bottom:1.5px solid var(--ink);
+  background:linear-gradient(120deg,var(--orange-soft),#FFFCF5 58%);
+}
+.modal-head .eyebrow{font-size:8px}
+.modal-head h2{font-family:'Unbounded',sans-serif;font-size:22px;line-height:1.15;letter-spacing:-.04em;font-weight:700;margin:4px 0 0}
+.close-btn{
+  flex:none;width:33px;height:33px;border:1.5px solid var(--ink);border-radius:50%;
+  background:var(--surface);color:var(--ink);display:grid;place-items:center;
+  box-shadow:1.5px 2px 0 rgba(23,35,28,.22);transition:transform .15s,background .15s;
+}
+.close-btn:hover{transform:rotate(7deg);background:var(--yellow-soft)}
+.close-btn svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.3;fill:none;stroke-linecap:round}
+.modal-body{padding:18px 20px;display:grid;gap:16px}
+.modal-foot{
+  display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap;
+  padding:13px 20px;border-top:1.5px solid var(--line);
+  background:#F8F2E7;position:sticky;bottom:0;z-index:2;
+}
+.ghost-btn{
+  border:1.5px solid var(--line-dark);border-radius:999px;background:var(--surface);
+  padding:10px 15px;font-size:11px;font-weight:800;color:var(--ink);
+  transition:border-color .15s,background .15s;
+}
+.ghost-btn:hover{background:#fff;border-color:var(--ink)}
+.modal .primary-btn{padding:10px 15px;font-size:11px}
+
+/* rules modal content */
+.step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.step-card{background:#FFFCF5;border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.step-num{
+  width:23px;height:23px;display:grid;place-items:center;margin-bottom:7px;
+  border-radius:7px;background:var(--ink);color:#fff;
+  font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;
+}
+.step-card b{display:block;font-size:10.5px;line-height:1.35;font-weight:800;margin-bottom:3px}
+.step-card p{margin:0;font-size:9px;line-height:1.45;color:#7B8278;font-weight:600}
+.score-rules{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#FFFCF5}
+.rule-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid #EDE7D9;font-size:10px;line-height:1.4;font-weight:600;color:#5D675E}
+.rule-row:last-child{border-bottom:0}
+.rule-row b{font-size:9px;font-weight:800;white-space:nowrap;padding:3px 7px;border-radius:5px;background:var(--paper-deep);color:var(--ink)}
+.rule-row b.good{background:var(--green-soft);color:var(--green)}
+.rule-row b.bad{background:var(--red-soft);color:var(--red)}
+.rule-row b.gold{background:var(--yellow-soft);color:#725609}
+.callout{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:10px 12px;border:1px solid #E4D9B6;border-radius:10px;
+  background:var(--yellow-soft);
+  font-size:9.5px;line-height:1.5;font-weight:600;color:#6E5B26;
+}
+.callout svg{width:15px;height:15px;flex:none;margin-top:1px;stroke:#8F7324;fill:none;stroke-width:1.8;stroke-linecap:round}
+.callout b{color:#4E421E}
+
+/* settings modal */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label,.fieldset-legend{font-size:8.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#7C8277}
+.field input[type="text"]{
+  width:100%;height:38px;padding:0 11px;border:1.5px solid var(--line-dark);border-radius:9px;
+  background:#FFFCF5;color:var(--ink);font-size:12px;font-weight:700;
+  transition:border-color .15s,box-shadow .15s;
+}
+.field input[type="text"]:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(246,196,69,.35)}
+.name-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fieldset{border:0;padding:0;margin:0;min-width:0}
+.fieldset .fieldset-legend{margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.settings-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px}
+.settings-section-head .fieldset-legend{margin-bottom:0}
+.field-hint{margin:0;font-size:8.5px;line-height:1.35;color:#9B9A8C;font-weight:600}
+.table-picks{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.table-pick{
+  min-width:0;padding:8px 5px;border:1.5px solid var(--line-dark);border-radius:9px;
+  background:#FFFCF5;color:var(--ink);text-align:center;
+  transition:background .15s,border-color .15s,transform .15s;
+}
+.table-pick span{display:block;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;line-height:1.2;letter-spacing:-.03em}
+.table-pick small{display:block;margin-top:2px;font-size:6.5px;line-height:1.2;font-weight:700;color:#A3A193;white-space:nowrap}
+.table-pick:hover{border-color:var(--ink)}
+.table-pick.is-active{background:var(--ink);border-color:var(--ink);color:#fff;transform:translateY(-1px);box-shadow:1.5px 2px 0 var(--yellow)}
+.table-pick.is-active small{color:#C9C7B9}
+.settings-row{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+.seg{display:flex;gap:4px;background:#EFE8DA;border:1px solid var(--line);border-radius:9px;padding:3px}
+.seg-btn{
+  flex:1;min-width:0;border:1px solid transparent;border-radius:6px;background:transparent;
+  padding:5px 4px;font-size:10px;font-weight:800;color:#737B70;
+  transition:background .15s,color .15s,box-shadow .15s;
+}
+.seg-btn.is-active{background:var(--surface);color:var(--ink);border-color:var(--line-dark);box-shadow:1px 1px 0 rgba(23,35,28,.08)}
+.switch-row{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:9px 11px;background:#F7F1E6;border:1px solid var(--line);border-radius:10px;
+  cursor:pointer;
+}
+.switch-copy b{display:block;font-size:10.5px;font-weight:800;line-height:1.3}
+.switch-copy small{display:block;font-size:8.5px;line-height:1.4;color:#8E9184;font-weight:600;margin-top:1px}
+.switch-wrap{position:relative;flex:none;width:36px;height:21px}
+.switch-wrap input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;margin:0}
+.switch-track{
+  position:absolute;inset:0;border-radius:999px;border:1.5px solid var(--ink);
+  background:#DCD4C4;transition:background .15s;
+}
+.switch-track::after{
+  content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--ink);transition:transform .18s;
+}
+.switch-wrap input:checked + .switch-track{background:var(--teal)}
+.switch-wrap input:checked + .switch-track::after{transform:translateX(15px);background:#fff}
+.form-error{
+  display:flex;align-items:center;gap:6px;margin:0;padding:7px 9px;border-radius:7px;
+  border:1px solid #E3B3A6;background:var(--red-soft);color:var(--red);
+  font-size:9px;line-height:1.4;font-weight:700;
+}
+
+/* ===== WIN MODAL ===== */
+.win-card{
+  width:min(570px,100%)!important;overflow:auto!important;
+  --team:var(--orange);--team-deep:var(--orange-deep);--team-soft:var(--orange-soft);
+}
+.win-card[data-winner="1"]{--team:var(--teal);--team-deep:var(--teal-deep);--team-soft:var(--teal-soft)}
+.win-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3}
+.win-confetti i{position:absolute;top:-16px;display:block;animation:confettiFall 2.4s linear forwards}
+.win-content{position:relative;z-index:1}
+.win-hero{
+  position:relative;text-align:center;padding:24px 22px 18px;
+  background:linear-gradient(180deg,var(--team-soft),rgba(255,252,245,.7) 82%);
+  border-bottom:1.5px solid var(--ink);
+}
+.win-kicker{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;
+  background:var(--ink);color:#FFFCF5;font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:10px;
+}
+.win-mascot{
+  width:68px;height:68px;margin:0 auto 9px;border-radius:20px;
+  background:var(--team);border:1.5px solid var(--ink);color:#fff;
+  display:grid;place-items:center;box-shadow:3px 4px 0 var(--ink);transform:rotate(-4deg);
+}
+.win-mascot svg{width:36px;height:36px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.win-hero h2{font-family:'Unbounded',sans-serif;font-size:clamp(25px,4.2vw,34px);line-height:1.04;font-weight:700;letter-spacing:-.05em;margin:0}
+.win-hero h2 span{color:var(--team-deep)}
+.win-sub{margin:7px auto 0;max-width:370px;font-size:10px;line-height:1.5;font-weight:600;color:#70786D}
+.win-score-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:13px}
+.win-score-label{margin-top:2px;text-align:center;font-size:7px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:#8C9186}
+.win-team-score{display:flex;flex-direction:column;align-items:center;gap:2px}
+.win-team-score small{font-size:7.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#83897E;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.win-team-score b{font-family:'Unbounded',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.05em;line-height:1}
+.win-team-score b.win-a{color:var(--orange-deep)}
+.win-team-score b.win-b{color:var(--teal-deep)}
+.win-score-sep{font-family:'Unbounded',sans-serif;font-size:20px;color:#B0AB9D}
+.win-tug-strip{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-top:9px;font-size:8.5px;font-weight:800;letter-spacing:.04em;color:#777E73;text-transform:uppercase;
+}
+.win-tug-strip svg{width:13px;height:13px;stroke:var(--team-deep);fill:none;stroke-width:2}
+.win-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:14px 20px;background:var(--surface)}
+.win-stat{border:1px solid var(--line);border-radius:9px;padding:8px;text-align:center;background:#FFFCF5}
+.win-stat span{display:block;font-size:7px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#929588;margin-bottom:3px}
+.win-stat b{display:block;font-family:'Unbounded',sans-serif;font-size:12px;line-height:1.2;letter-spacing:-.02em}
+.win-actions{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:13px 20px 18px;border-top:1px solid var(--line);background:#F8F2E7}
+
+/* ===== TOAST / EFFECTS ===== */
+.toast{
+  position:fixed;left:50%;bottom:22px;z-index:400;
+  display:inline-flex;align-items:center;gap:7px;
+  transform:translate(-50%,16px);opacity:0;pointer-events:none;
+  padding:10px 15px;border-radius:999px;
+  background:var(--ink);color:#FFFCF5;border:1px solid rgba(255,252,245,.2);
+  box-shadow:0 8px 24px rgba(23,35,28,.25);
+  font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.01em;
+  transition:opacity .2s ease, transform .2s ease;
+  max-width:min(90vw,420px);text-align:center;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast::before{content:"";width:6px;height:6px;flex:none;border-radius:50%;background:var(--yellow)}
+.badge-pulse{animation:badgePulse .5s ease}
+.score-bump{animation:scoreBump .48s cubic-bezier(.2,1.2,.3,1)}
+.card-correct-flash{animation:correctFlash .7s ease}
+.card-wrong-flash{animation:wrongFlash .7s ease}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes softPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+@keyframes floatUp{0%{opacity:0;transform:translate(-50%,10px) scale(.8)}18%{opacity:1;transform:translate(-50%,-2px) scale(1.08)}55%{opacity:1;transform:translate(-50%,-18px) scale(1)}100%{opacity:0;transform:translate(-50%,-42px) scale(.94)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes scoreBump{0%,100%{transform:scale(1)}45%{transform:scale(1.18);color:var(--team,var(--orange))}}
+@keyframes correctFlash{0%{box-shadow:4px 5px 0 var(--green)}100%{box-shadow:4px 5px 0 rgba(23,35,28,.10)}}
+@keyframes wrongFlash{0%{box-shadow:4px 5px 0 var(--red)}100%{box-shadow:4px 5px 0 rgba(23,35,28,.10)}}
+@keyframes badgePulse{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(520px) rotate(560deg);opacity:0}}
+@keyframes pulseYellow{0%,100%{box-shadow:0 0 0 0 rgba(246,196,69,.4)}50%{box-shadow:0 0 0 5px rgba(246,196,69,0)}}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:1120px){
+  .topbar-inner{gap:14px}
+  .match-tag{display:none}
+  .heading-row{gap:22px}
+  .heading-row h1{font-size:clamp(26px,3.3vw,38px)}
+  .lede{width:260px;font-size:11px}
+  .score-row{grid-template-columns:minmax(0,1fr) 300px minmax(0,1fr)}
+  .match-center{width:300px}
+  .play-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+  .rules-panel{grid-column:1/-1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px 16px;padding:10px 14px}
+  .rules-panel::before{display:none}
+  .rules-top{display:flex;align-items:center;gap:9px}
+  .rules-top .eyebrow{display:none}
+  .rules-panel h3{margin:0;font-size:12px;grid-column:2;grid-row:1;line-height:1.3}
+  .rules-list{grid-column:2;grid-row:2;display:flex;flex-wrap:wrap;gap:0 13px;margin-top:3px}
+  .rules-list li{border-bottom:0;padding:2px 0;font-size:8.5px}
+  .rule-icon{width:19px;height:17px;font-size:7.5px}
+  .rules-tip{display:none}
+  .rules-foot{grid-column:3;grid-row:1/3;padding:0;margin:0;align-self:center;width:92px}
+  .card-body{grid-template-columns:minmax(0,1fr) 158px;gap:8px;padding:11px}
+  .key{height:35px}
+  .expression{font-size:29px}
+  .answer-slot{height:48px;font-size:23px}
+  .protocol{grid-template-columns:1fr}
+  .site-footer{flex-direction:column;align-items:flex-start;gap:8px}
+  .footer-links{align-self:flex-start}
+}
+@media (max-width:880px){
+  .topbar .text-btn{display:none}
+  .topbar .mobile-settings{display:grid}
+  .topbar-inner{padding:9px 16px;min-height:58px}
+  .brand-mark{width:36px;height:36px;border-radius:11px}
+  .brand-mark svg{width:23px;height:23px}
+  .brand-copy b{font-size:16px}
+  .brand-copy small{font-size:8px}
+  .primary-btn{padding:9px 12px;font-size:10px}
+  .app{padding:16px 16px 0}
+  .heading-row{display:block;margin-bottom:14px}
+  .heading-row h1{font-size:clamp(24px,5.7vw,34px)}
+  .heading-row h1 br{display:none}
+  .lede{display:none}
+  .score-row{grid-template-columns:1fr 1fr}
+  .team-left{order:1}.team-right{order:2}.match-center{order:3;grid-column:1/-1;width:100%;border-left:0;border-right:0;border-top:1.5px solid var(--ink);grid-template-columns:auto 1fr auto;grid-template-rows:auto 1fr;padding:8px 13px;column-gap:10px}
+  .phase-pill{grid-column:1;grid-row:1}
+  .center-copy{grid-column:2;grid-row:2}
+  .start-btn{width:auto;min-width:105px;margin-top:3px}
+  .center-copy>span{margin-top:1px}
+  .timer-ring{grid-row:2;grid-column:1;width:57px;height:57px}
+  .center-copy strong{font-size:11px}
+  .score-row{min-height:98px}
+  .team-block{padding:10px 12px;gap:9px}
+  .team-badge{width:45px;height:45px;border-radius:13px}
+  .team-badge svg{width:23px;height:23px}
+  .team-name{font-size:15px;max-width:120px}
+  .score-num{font-size:29px}
+  .team-kicker{font-size:7.5px}
+  .streak{font-size:8.5px}
+  .arena-top{padding:7px 12px 1px}
+  .arena-label{font-size:7.5px}
+  .arena-label span.hide-mobile{display:none}
+  .tug-caption{font-size:8px;max-width:58%;padding:3px 8px}
+  .arena-bottom{padding:1px 12px 7px}
+  .play-grid{grid-template-columns:1fr;gap:11px;margin-top:11px}
+  .rules-panel{grid-column:auto;order:-1}
+  .rules-panel h3{font-size:12px}
+  .rules-list{display:none}
+  .rules-foot{display:none}
+  .rules-panel{grid-template-columns:auto 1fr;padding:8px 11px;gap:8px}
+  .vs-badge{width:29px;height:29px;border-radius:8px;font-size:10px;box-shadow:1.5px 2px 0 rgba(238,95,43,.85)}
+  .rules-panel h3{font-size:11px;grid-column:2;grid-row:1;margin:0}
+  .rules-panel .eyebrow{display:block;grid-column:2;grid-row:2;text-align:left;font-size:7.5px;color:#B6B4A5}
+  .card-body{grid-template-columns:minmax(0,1fr) 185px;gap:11px;padding:12px}
+  .expression{font-size:32px}
+  .key{height:40px;font-size:16px}
+  .answer-slot{height:52px;font-size:25px;max-width:100px}
+  .protocol{margin-top:12px;gap:10px}
+  .panel{padding:12px 13px}
+  .site-footer{padding:14px 16px 24px}
+  .step-grid{grid-template-columns:1fr}
+  .win-stats{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  #tugSvg{min-height:126px}
+  .top-actions .primary-btn span{display:none}
+  .top-actions .primary-btn{width:36px;height:36px;border-radius:50%;padding:0}
+  .top-actions{gap:5px}
+  .brand-copy small{display:none}
+  .heading-row .eyebrow{font-size:8px}
+  .heading-row h1{font-size:clamp(23px,7vw,30px)}
+  .board-strip{font-size:7.5px;padding:6px 10px;letter-spacing:.09em}
+  .board-strip .strip-center{font-size:7.5px;letter-spacing:.1em}
+  .score-row{grid-template-columns:1fr 1fr}
+  .team-block{padding:8px 9px;gap:7px}
+  .team-badge{width:37px;height:37px;border-radius:11px;box-shadow:1.5px 2px 0 rgba(23,35,28,.2)}
+  .team-badge svg{width:19px;height:19px}
+  .team-name{font-size:13px;max-width:94px}
+  .team-kicker{font-size:6.5px;letter-spacing:.08em}
+  .score-num{font-size:25px}
+  .score-label{font-size:6.5px}
+  .streak{font-size:7.5px}
+  .team-right{text-align:right}
+  .card-body{grid-template-columns:1fr 170px;gap:8px;padding:10px}
+  .expression{font-size:29px}
+  .keypad{gap:4px}
+  .key{height:37px;font-size:15px}
+  .answer-slot{height:47px;font-size:22px;min-width:63px}
+  .feedback{font-size:8.5px;min-height:34px}
+  .card-head{padding:7px 9px}
+  .card-team b{font-size:10px;max-width:130px}
+  .jersey-dot{width:21px;height:21px;font-size:8px}
+  .status-chip{font-size:6.5px;padding:2px 5px}
+  .kbd-hint{display:none!important}
+  .match-center{grid-template-columns:auto 1fr;padding:7px 10px}
+  .phase-pill{font-size:7px}
+  .center-copy strong{font-size:10px}
+  .center-copy>span{font-size:8px;max-width:145px}
+  .start-btn{min-width:88px;font-size:8.5px}
+  .timer-ring{width:51px;height:51px}
+  .timer-value b{font-size:16px}
+  .arena-top{gap:6px;flex-wrap:wrap}
+  .arena-label{font-size:6.5px;max-width:27%}
+  .tug-caption{font-size:7px;max-width:100%;order:3;width:100%;justify-content:center}
+  .arena-legend{font-size:7px;gap:7px}
+  .pause-btn{font-size:7.5px;padding:3px 7px}
+  .panel-head h2{font-size:12px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .name-fields,.settings-row{grid-template-columns:1fr}
+  .table-picks{grid-template-columns:repeat(5,1fr);gap:4px}
+  .table-pick span{font-size:11px}
+  .table-pick small{font-size:5.5px}
+  .modal{padding:8px}
+  .modal-card{max-height:calc(100vh - 16px);border-radius:16px;box-shadow:4px 5px 0 rgba(23,35,28,.25)}
+  .modal-head{padding:13px 14px}
+  .modal-head h2{font-size:17px}
+  .modal-body{padding:13px 14px;gap:12px}
+  .modal-foot{padding:10px 14px}
+  .modal-foot .primary-btn,.modal-foot .ghost-btn{flex:1;justify-content:center;text-align:center}
+  .win-hero{padding:18px 14px 14px}
+  .win-stats{padding:11px 13px;grid-template-columns:1fr 1fr;gap:5px}
+  .win-actions{padding:10px 13px 13px}
+  .win-actions .primary-btn,.win-actions .ghost-btn{flex:1;justify-content:center}
+  .site-footer p{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#match" aria-label="Тяни! Тренажёр умножения — к матчу">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32">
+          <path d="M8 23c0-5.5 5.5-7 9.5-4s9.5 1.5 9.5-4" fill="none" stroke="#F6C445" stroke-width="3.2" stroke-linecap="round"/>
+          <circle cx="8" cy="23" r="3.1" fill="#EE5F2B"/>
+          <circle cx="27" cy="15" r="3.1" fill="#EE5F2B"/>
+        </svg>
+      </span>
+      <span class="brand-copy"><b>ТЯНИ!</b><small>тренажёр умножения · 5–9</small></span>
+    </a>
+    <div class="match-tag" aria-hidden="true">
+      <span class="live-dot"></span>
+      <span>товарищеский матч</span>
+      <span class="slash">/</span>
+      <span>до <span data-target-label>6</span> рывков</span>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="soundBtn" type="button" aria-label="Выключить звук" aria-pressed="true" title="Звук">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M11 5 6.5 9H3v6h3.5L11 19V5Z" fill="currentColor" stroke="none"/>
+          <path class="sound-wave" d="M15.5 8.5a5 5 0 0 1 0 7"/>
+          <path class="sound-wave" d="M18.5 6a9 9 0 0 1 0 12"/>
+          <path d="M4 4l16 16" id="soundSlash" stroke-width="2"/>
+        </svg>
+      </button>
+      <button class="text-btn" type="button" data-open="rules">Правила</button>
+      <button class="text-btn" type="button" data-open="settings">Настройки</button>
+      <button class="icon-btn mobile-settings" type="button" data-open="settings" aria-label="Настройки матча" title="Настройки">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M18.6 5.4l-1.8 1.8M7.2 16.8l-1.8 1.8"/></svg>
+      </button>
+      <button class="primary-btn" id="newMatchBtn" type="button" title="Начать заново">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Новый матч</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="app" id="match">
+  <div class="heading-row">
+    <div class="heading-main">
+      <div class="eyebrow">интерактивный класс · две команды</div>
+      <h1>Перетяни <span class="accent">таблицу</span><br>на свою сторону<span class="dot">.</span></h1>
+    </div>
+    <p class="lede">Один пример — два ответа одновременно. <b>Верное умножение</b> двигает канат, а ошибка отдаёт преимущество сопернику.</p>
+  </div>
+  <section class="match-board" aria-label="Счёт и ход матча">
+    <div class="board-strip">
+      <div class="strip-side"><span class="signal"></span><span>матч <span class="match-number" id="matchNo">01</span></span></div>
+      <div class="strip-center" aria-hidden="true">×5 · ×6 · ×7 · ×8 · ×9</div>
+      <div class="strip-side"><span id="roundLabel">раунд —</span><span aria-hidden="true">/</span><span>до <span data-target-label>6</span> рывков</span></div>
+    </div>
+
+    <div class="score-row">
+      <div class="team-block team-left">
+        <div class="team-badge badge-a" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M13.5 2.5 5 14h5.4L9.5 21.5 19 10h-5.7l.2-7.5Z"/></svg>
+        </div>
+        <div class="team-ident">
+          <span class="team-kicker">команда 01</span>
+          <h2 class="team-name" id="nameHead0">Искры</h2>
+          <span class="streak" id="streakHead0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2S7 8.7 7 13.5a5 5 0 0 0 10 0c0-2-1-3.8-2.2-5.3-.3 2-1.1 3.2-2.3 4 1.4-3.6 1.9-6.8 1-10.2Z"/></svg>серия —</span>
+        </div>
+        <div class="team-score">
+          <span class="score-num" id="scoreHead0">0</span>
+          <span class="score-label">верных</span>
+        </div>
+      </div>
+
+      <div class="match-center">
+        <div class="phase-pill" id="phasePill"><span class="phase-dot"></span><span id="phaseText">матч готов</span></div>
+        <div class="timer-ring" id="timerRing" aria-label="Время раунда">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <circle class="ring-track" cx="32" cy="32" r="26"></circle>
+            <circle class="ring-progress" id="timerProgress" cx="32" cy="32" r="26"></circle>
+          </svg>
+          <span class="timer-value"><b id="timerText">20</b><small id="timerUnit">сек</small></span>
+        </div>
+        <div class="center-copy">
+          <strong id="centerTitle">Всё готово?</strong>
+          <span id="centerSub">Две команды. Одна таблица.</span>
+          <button class="start-btn" id="startBtn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8V4Z"/></svg>
+            <span id="startBtnText">Начать матч</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="team-block team-right">
+        <div class="team-badge badge-b" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3 8c2.5-3.7 5.5 3.7 8 0s5.5 3.7 8 0M3 15c2.5-3.7 5.5 3.7 8 0s5.5 3.7 8 0"/></svg>
+        </div>
+        <div class="team-ident">
+          <span class="team-kicker">команда 02</span>
+          <h2 class="team-name" id="nameHead1">Волны</h2>
+          <span class="streak" id="streakHead1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2S7 8.7 7 13.5a5 5 0 0 0 10 0c0-2-1-3.8-2.2-5.3-.3 2-1.1 3.2-2.3 4 1.4-3.6 1.9-6.8 1-10.2Z"/></svg>серия —</span>
+        </div>
+        <div class="team-score">
+          <span class="score-num" id="scoreHead1">0</span>
+          <span class="score-label">верных</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arena" id="arena">
+      <div class="arena-top">
+        <div class="arena-label">команда <b id="arenaName0">Искры</b><br><span class="hide-mobile">тянут на себя ←</span></div>
+        <div class="tug-caption" id="arenaCaption" aria-live="polite">Канат у центральной линии</div>
+        <div class="arena-label is-right">команда <b id="arenaName1">Волны</b><br><span class="hide-mobile">→ тянут на себя</span></div>
+      </div>
+      <div class="arena-stage" id="arenaStage">
+        <svg id="tugSvg" viewBox="0 0 1400 220" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Перетягивание каната. Сейчас преимущество у центра">
+          <defs>
+            <linearGradient id="arenaShade" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F5EBD9"></stop>
+              <stop offset="1" stop-color="#EADCC3"></stop>
+            </linearGradient>
+            <g id="puller">
+              <path d="M-44 0h24M12 0h26" fill="none" stroke="#17231C" stroke-width="7" stroke-linecap="round"></path>
+              <path d="M-4 -48 L-29 -1" fill="none" stroke="#22362C" stroke-width="12" stroke-linecap="round"></path>
+              <path d="M4 -48 L23 -1" fill="none" stroke="#2B4235" stroke-width="12" stroke-linecap="round"></path>
+              <path class="shorts" d="M-10 -58h25l4 16H6L3 -50 0 -42h-13z" fill="#22362C" stroke="#17231C" stroke-width="2.2" stroke-linejoin="round"></path>
+              <path class="jersey" d="M-9 -54C-16 -82 -8 -108 4 -118l17 10c-8 18-8 36-6 53z" fill="currentColor" stroke="#17231C" stroke-width="2.4" stroke-linejoin="round"></path>
+              <path d="M5 -92c23 5 44 9 62 11" fill="none" stroke="#F0C39B" stroke-width="9" stroke-linecap="round"></path>
+              <path d="M11 -101c23 5 42 12 62 16" fill="none" stroke="#F0C39B" stroke-width="9" stroke-linecap="round"></path>
+              <circle cx="13" cy="-131" r="17" class="skin" fill="#F0C39B" stroke="#17231C" stroke-width="2.2"></circle>
+              <path d="M-3 -135c1-13 26-17 32-3l-1 4c-9-5-20-5-30 0z" class="hair" fill="#3B2A20"></path>
+              <path d="M-3 -129c11-6 24-6 32 0l-1 5c-9-5-19-5-30 1z" class="band" fill="#FFFCF5" stroke="#17231C" stroke-width="1.6"></path>
+              <circle cx="23" cy="-132" r="2.1" class="eye" fill="#17231C"></circle>
+              <path d="M23 -122q4 3 8 0" class="mouth" fill="none" stroke="#17231C" stroke-width="1.6" stroke-linecap="round"></path>
+              <circle cx="28" cy="-124" r="3" class="cheek" fill="#E9A17B" opacity=".55"></circle>
+              <path d="M-14 -60h26" fill="none" stroke="#17231C" stroke-width="2.3"></path>
+            </g>
+          </defs>
+          <rect class="scene-bg" x="0" y="0" width="1400" height="220"></rect>
+          <rect class="scene-shade" x="0" y="0" width="1400" height="220" opacity=".58"></rect>
+          <circle cx="1290" cy="35" r="54" fill="#F6C445" opacity=".12"></circle>
+          <circle cx="95" cy="48" r="36" fill="#EE5F2B" opacity=".09"></circle>
+          <path d="M300 56h16M308 48v16M1110 72h13M1116.5 65.5v13" stroke="#A5977C" stroke-width="2" stroke-linecap="round" opacity=".5"></path>
+
+          <g aria-hidden="true">
+            <line class="center-guide" x1="700" y1="52" x2="700" y2="199"></line>
+            <line class="goal-guide" x1="500" y1="80" x2="500" y2="207" stroke="#EE5F2B"></line>
+            <path class="goal-flag" d="M500 84h31l-9 9 9 9h-31z" fill="#EE5F2B"></path>
+            <text class="goal-text" id="leftGoalText" x="516" y="99" text-anchor="middle" fill="#FFFFFF">6</text>
+            <line class="goal-guide" x1="900" y1="80" x2="900" y2="207" stroke="#177E70"></line>
+            <path class="goal-flag" d="M900 84h-31l9 9-9 9h31z" fill="#177E70"></path>
+            <text class="goal-text" id="rightGoalText" x="884" y="99" text-anchor="middle" fill="#FFFFFF">6</text>
+          </g>
+
+          <g id="fieldTicks" aria-hidden="true"></g>
+          <line id="progressLine" x1="700" y1="175" x2="700" y2="175" stroke="#F6C445" stroke-width="8" stroke-linecap="round" opacity="0"></line>
+
+          <path class="rope-shadow" d="M150 116C420 149 980 149 1250 116"></path>
+          <path class="rope-under" d="M150 114C420 147 980 147 1250 114"></path>
+          <path class="rope-top" d="M150 114C420 147 980 147 1250 114"></path>
+          <path class="rope-twist" d="M150 114C420 147 980 147 1250 114"></path>
+
+          <g transform="translate(700 141)">
+            <g id="knotMove" class="knot-move">
+              <path class="knot-tail" d="M-11 -6-28 0l17 6z"></path>
+              <path class="knot-tail" d="M11 -6 28 0 11 6z"></path>
+              <circle class="knot-body" cx="0" cy="0" r="14.5"></circle>
+              <circle class="knot-dot" cx="0" cy="0" r="3.6"></circle>
+            </g>
+          </g>
+
+          <g aria-hidden="true">
+            <use href="#puller" style="color:#D94E1D" transform="translate(82 207) scale(.93)"></use>
+            <use href="#puller" style="color:#EE5F2B" transform="translate(142 207) scale(1.01)"></use>
+            <use href="#puller" style="color:#F4773D" transform="translate(202 207) scale(.92)"></use>
+            <ellipse class="dust" cx="45" cy="204" rx="22" ry="4"></ellipse>
+            <ellipse class="dust" cx="165" cy="205" rx="26" ry="4"></ellipse>
+
+            <use href="#puller" style="color:#0D5D52" transform="translate(1318 207) scale(-.93 .93)"></use>
+            <use href="#puller" style="color:#177E70" transform="translate(1258 207) scale(-1.01 1.01)"></use>
+            <use href="#puller" style="color:#2A9B8B" transform="translate(1198 207) scale(-.92 .92)"></use>
+            <ellipse class="dust" cx="1355" cy="204" rx="22" ry="4"></ellipse>
+            <ellipse class="dust" cx="1235" cy="205" rx="26" ry="4"></ellipse>
+          </g>
+
+          <line class="ground-line" x1="26" y1="207" x2="1374" y2="207"></line>
+        </svg>
+      </div>
+      <div class="arena-bottom">
+        <div class="arena-legend" aria-hidden="true">
+          <span class="legend-item"><i class="legend-dot a"></i><span id="legendName0">Искры</span></span>
+          <span class="legend-vs">VS</span>
+          <span class="legend-item"><i class="legend-dot b"></i><span id="legendName1">Волны</span></span>
+        </div>
+        <button class="pause-btn" id="pauseBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h4v16H7zM14 4h4v16h-4z"/></svg>
+          <span id="pauseBtnText">Пауза</span>
+        </button>
+      </div>
+      <div class="pause-curtain" id="pauseCurtain" hidden><span>Матч на паузе</span></div>
+    </div>
+  </section>
+
+  <section class="play-grid" aria-label="Игровые задания команд">
+    <article class="answer-card team-a is-active" id="answerCard0" data-team="0">
+      <div class="card-head">
+        <div class="card-team"><span class="jersey-dot">01</span><b id="cardName0">Искры</b><span class="kbd-hint">⌨</span></div>
+        <span class="status-chip" id="cardStatus0">ждёт старта</span>
+      </div>
+      <div class="card-body">
+        <div class="question-pane">
+          <span class="q-label">решите пример</span>
+          <div class="expression" id="expression0">7 <span class="times">×</span> 8</div>
+          <div class="eq-row">
+            <span class="eq-sign">=</span>
+            <div class="answer-slot" id="answerDisplay0" aria-live="polite">?</div>
+          </div>
+          <div class="feedback" id="feedback0">Нажмите «Начать матч» в центре табло.</div>
+        </div>
+        <div class="keypad" id="keypad0" role="group" aria-label="Ввод ответа командой Искры">
+          <button class="key" type="button" data-key="1">1</button>
+          <button class="key" type="button" data-key="2">2</button>
+          <button class="key" type="button" data-key="3">3</button>
+          <button class="key" type="button" data-key="4">4</button>
+          <button class="key" type="button" data-key="5">5</button>
+          <button class="key" type="button" data-key="6">6</button>
+          <button class="key" type="button" data-key="7">7</button>
+          <button class="key" type="button" data-key="8">8</button>
+          <button class="key" type="button" data-key="9">9</button>
+          <button class="key key--del" type="button" data-key="del" aria-label="Удалить последнюю цифру">⌫</button>
+          <button class="key" type="button" data-key="0">0</button>
+          <button class="key key--ok" type="button" data-key="ok" aria-label="Проверить ответ">✓</button>
+        </div>
+      </div>
+      <div class="card-foot"><span>0–9 · ввод с клавиатуры</span><span>Enter — ответ</span></div>
+    </article>
+
+    <aside class="rules-panel" aria-label="Правила рывка">
+      <div class="rules-top">
+        <div class="vs-badge">VS</div>
+        <span class="eyebrow">правила<br>рывка</span>
+      </div>
+      <h3>Верно — тяни.<br>Ошибся — отдай.</h3>
+      <ul class="rules-list">
+        <li><span class="rule-icon plus">+1</span><span>Верный ответ двигает канат</span></li>
+        <li><span class="rule-icon minus">−1</span><span>Ошибка отдаёт рывок сопернику</span></li>
+        <li><span class="rule-icon speed">⚡</span><span>Оба верно — решает скорость</span></li>
+        <li><span class="rule-icon goal">⚑</span><span>Победа — <b data-target-label>6</b> рывков</span></li>
+      </ul>
+      <p class="rules-tip">Оба ответили верно? Быстрейшая команда получает один рывок.</p>
+      <div class="rules-foot">
+        <button class="pause-btn pause-btn--wide" id="pauseBtnWide" type="button" disabled>остановить таймер</button>
+      </div>
+    </aside>
+
+    <article class="answer-card team-b" id="answerCard1" data-team="1">
+      <div class="card-head">
+        <div class="card-team"><span class="jersey-dot">02</span><b id="cardName1">Волны</b><span class="kbd-hint">⌨</span></div>
+        <span class="status-chip" id="cardStatus1">ждёт старта</span>
+      </div>
+      <div class="card-body">
+        <div class="question-pane">
+          <span class="q-label">решите пример</span>
+          <div class="expression" id="expression1">7 <span class="times">×</span> 8</div>
+          <div class="eq-row">
+            <span class="eq-sign">=</span>
+            <div class="answer-slot" id="answerDisplay1" aria-live="polite">?</div>
+          </div>
+          <div class="feedback" id="feedback1">Нажмите «Начать матч» в центре табло.</div>
+        </div>
+        <div class="keypad" id="keypad1" role="group" aria-label="Ввод ответа командой Волны">
+          <button class="key" type="button" data-key="1">1</button>
+          <button class="key" type="button" data-key="2">2</button>
+          <button class="key" type="button" data-key="3">3</button>
+          <button class="key" type="button" data-key="4">4</button>
+          <button class="key" type="button" data-key="5">5</button>
+          <button class="key" type="button" data-key="6">6</button>
+          <button class="key" type="button" data-key="7">7</button>
+          <button class="key" type="button" data-key="8">8</button>
+          <button class="key" type="button" data-key="9">9</button>
+          <button class="key key--del" type="button" data-key="del" aria-label="Удалить последнюю цифру">⌫</button>
+          <button class="key" type="button" data-key="0">0</button>
+          <button class="key key--ok" type="button" data-key="ok" aria-label="Проверить ответ">✓</button>
+        </div>
+      </div>
+      <div class="card-foot"><span>0–9 · ввод с клавиатуры</span><span>Enter — ответ</span></div>
+    </article>
+  </section>
+
+  <section class="protocol" id="protocolSection" aria-label="Протокол и статистика матча">
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="eyebrow">судья на связи</div><h2>Лента раундов</h2></div>
+        <div class="panel-meta">обновляется<br>по ходу матча</div>
+      </div>
+      <div class="round-log" id="roundLog">
+        <div class="log-empty">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16H7zM4 8h3M4 12h3M4 16h3M17 8h3M17 12h3M17 16h3"/></svg>
+          <span>Здесь появятся раунды, ответы команд и направление рывка.</span>
+        </div>
+      </div>
+      <div class="log-legend">
+        <span><i class="legend-square a"></i>Искры</span>
+        <span><i class="legend-square b"></i>Волны</span>
+        <span>✓ верно</span>
+        <span>✕ ошибка</span>
+        <span>← / → рывок</span>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="eyebrow">цифры матча</div><h2>Статистика</h2></div>
+        <div class="panel-meta" id="protocolMeta">раундов: 0</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <span class="stat-label">верные ответы</span>
+          <div class="stat-values"><b class="is-a" id="statCorrect0">0</b><span class="colon">:</span><b class="is-b" id="statCorrect1">0</b></div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">ошибки</span>
+          <div class="stat-values"><b class="is-a" id="statErrors0">0</b><span class="colon">:</span><b class="is-b" id="statErrors1">0</b></div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">лучшая серия</span>
+          <div class="stat-values"><b class="is-a" id="statBest0">0</b><span class="colon">:</span><b class="is-b" id="statBest1">0</b></div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">средний ответ</span>
+          <div class="stat-values"><b class="is-a" id="statTime0">—</b><span class="colon">:</span><b class="is-b" id="statTime1">—</b><small>сек</small></div>
+        </div>
+      </div>
+      <div class="proto-note">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <span>Счёт — только верные ответы. Канат двигают рывки.</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-brand">
+    <span class="mini-knot" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M8 23c0-5.5 5.5-7 9.5-4s9.5 1.5 9.5-4" fill="none" stroke="#F6C445" stroke-width="4" stroke-linecap="round"/></svg></span>
+    <span>ТЯНИ! · математика в движении</span>
+  </div>
+  <p>Тренажёр для 2 команд: таблица умножения на 5, 6, 7, 8 и 9. Играйте на одном экране или интерактивной доске.</p>
+  <div class="footer-links">
+    <button type="button" data-open="rules">как играть</button>
+    <button type="button" data-open="settings">настроить матч</button>
+  </div>
+</footer>
+
+<div class="modal" id="rulesModal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="rulesTitle" tabindex="-1">
+    <header class="modal-head">
+      <div><div class="eyebrow">памятка капитанам</div><h2 id="rulesTitle">Как перетянуть канат</h2></div>
+      <button class="close-btn" type="button" data-close aria-label="Закрыть правила">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div class="modal-body">
+      <div class="step-grid">
+        <div class="step-card"><div class="step-num">01</div><b>Один пример</b><p>Обе команды одновременно получают одинаковый пример из таблицы 5–9.</p></div>
+        <div class="step-card"><div class="step-num">02</div><b>Два ответа</b><p>Каждая команда вводит ответ на своей половине и нажимает ✓.</p></div>
+        <div class="step-card"><div class="step-num">03</div><b>Общий канат</b><p>Верный ответ тянет канат, ошибка отдаёт преимущество сопернику.</p></div>
+      </div>
+      <div class="score-rules">
+        <div class="rule-row"><span>Верный ответ</span><b class="good">+1 рывок</b></div>
+        <div class="rule-row"><span>Ошибка или время вышло</span><b class="bad">−1 рывок сопернику</b></div>
+        <div class="rule-row"><span>Оба ответили верно</span><b class="gold">+1 самой быстрой</b></div>
+        <div class="rule-row"><span>Оба ошиблись</span><b>0, канат на месте</b></div>
+      </div>
+      <div class="callout">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9M12 16h.01"/><circle cx="12" cy="12" r="9"/></svg>
+        <span><b>Разница до 2 рывков за раунд:</b> если одна команда ответила верно, а другая ошиблась, канат смещается в сторону знатока на два деления.</span>
+      </div>
+      <div class="callout" style="background:#E9F2EE;border-color:#BFD8CD;color:#466558">
+        <svg viewBox="0 0 24 24" style="stroke:#447866" aria-hidden="true"><path d="M4 6h16v10H9l-5 4V6Z"/></svg>
+        <span>Клавиатура помогает капитанам: сначала выберите свою карточку, затем вводите цифры и нажмите Enter. Пробел или P ставит матч на паузу.</span>
+      </div>
+    </div>
+    <footer class="modal-foot">
+      <button class="ghost-btn" type="button" data-close>Понятно</button>
+      <button class="primary-btn" id="rulesStart" type="button">К матчу →</button>
+    </footer>
+  </section>
+</div>
+
+<div class="modal" id="settingsModal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" tabindex="-1">
+    <header class="modal-head" style="background:linear-gradient(120deg,var(--teal-soft),#FFFCF5 58%)">
+      <div><div class="eyebrow">судья и секундомер</div><h2 id="settingsTitle">Настройки матча</h2></div>
+      <button class="close-btn" type="button" data-close aria-label="Закрыть настройки">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <form class="modal-body" id="settingsForm" novalidate>
+      <div class="name-fields">
+        <div class="field"><label for="inputName0">Команда слева</label><input type="text" id="inputName0" maxlength="18" autocomplete="off" placeholder="Искры"></div>
+        <div class="field"><label for="inputName1">Команда справа</label><input type="text" id="inputName1" maxlength="18" autocomplete="off" placeholder="Волны"></div>
+      </div>
+      <div class="fieldset">
+        <div class="settings-section-head">
+          <span class="fieldset-legend" id="tablesLabel">Таблицы умножения</span>
+          <p class="field-hint">выберите одну или несколько</p>
+        </div>
+        <div class="table-picks" role="group" aria-labelledby="tablesLabel">
+          <button class="table-pick is-active" type="button" data-table="5" aria-pressed="true"><span>×5</span><small>5×2 … 5×9</small></button>
+          <button class="table-pick is-active" type="button" data-table="6" aria-pressed="true"><span>×6</span><small>6×2 … 6×9</small></button>
+          <button class="table-pick is-active" type="button" data-table="7" aria-pressed="true"><span>×7</span><small>7×2 … 7×9</small></button>
+          <button class="table-pick is-active" type="button" data-table="8" aria-pressed="true"><span>×8</span><small>8×2 … 8×9</small></button>
+          <button class="table-pick is-active" type="button" data-table="9" aria-pressed="true"><span>×9</span><small>9×2 … 9×9</small></button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div class="fieldset">
+          <span class="fieldset-legend">Время раунда</span>
+          <div class="seg" id="timeSeg" role="group" aria-label="Время на ответ">
+            <button class="seg-btn" type="button" data-time="10">10 с</button>
+            <button class="seg-btn" type="button" data-time="15">15 с</button>
+            <button class="seg-btn is-active" type="button" data-time="20">20 с</button>
+            <button class="seg-btn" type="button" data-time="30">30 с</button>
+          </div>
+        </div>
+        <div class="fieldset">
+          <span class="fieldset-legend">До победы</span>
+          <div class="seg" id="targetSeg" role="group" aria-label="Количество рывков до победы">
+            <button class="seg-btn" type="button" data-target="5">5</button>
+            <button class="seg-btn is-active" type="button" data-target="6">6</button>
+            <button class="seg-btn" type="button" data-target="8">8</button>
+          </div>
+        </div>
+      </div>
+      <label class="switch-row" for="settingSound">
+        <span class="switch-copy"><b>Звуковые эффекты</b><small>Короткие сигналы верного ответа и рывка</small></span>
+        <span class="switch-wrap">
+          <input type="checkbox" id="settingSound" checked>
+          <span class="switch-track"></span>
+        </span>
+      </label>
+      <p class="form-error" id="settingsError" hidden></p>
+    </form>
+    <footer class="modal-foot">
+      <button class="ghost-btn" type="button" data-close>Отмена</button>
+      <button class="primary-btn" id="applySettings" type="button">Применить и заново</button>
+    </footer>
+  </section>
+</div>
+
+<div class="modal" id="winModal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <section class="modal-card win-card" id="winCard" role="dialog" aria-modal="true" aria-labelledby="winTitle" data-winner="0" tabindex="-1">
+    <div class="win-confetti" id="winConfetti" aria-hidden="true"></div>
+    <div class="win-content">
+      <div class="win-hero">
+        <div class="win-kicker">финальный свисток</div>
+        <div class="win-mascot" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4ZM7 5H4v2a4 4 0 0 0 4 4M17 5h3v2a4 4 0 0 1-4 4"/></svg>
+        </div>
+        <h2 id="winTitle"><span id="winTeamName">«Искры»</span><br>забирают канат!</h2>
+        <p class="win-sub" id="winSub">Команда выиграла перетягивание. Отличная работа с таблицей умножения!</p>
+        <div class="win-score-row" aria-label="Счёт по верным ответам">
+          <div class="win-team-score"><small id="winName0">Искры</small><b class="win-a" id="winScore0">0</b></div>
+          <span class="win-score-sep">:</span>
+          <div class="win-team-score"><small id="winName1">Волны</small><b class="win-b" id="winScore1">0</b></div>
+        </div>
+        <div class="win-score-label">верных ответов</div>
+        <div class="win-tug-strip">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg>
+          <span>канат: <b id="winPull">6 из 6</b></span>
+        </div>
+      </div>
+      <div class="win-stats">
+        <div class="win-stat"><span>раундов</span><b id="winRounds">0</b></div>
+        <div class="win-stat"><span>лучшая серия</span><b id="winBest">0</b></div>
+        <div class="win-stat"><span>средний ответ</span><b id="winAvg">—</b></div>
+      </div>
+      <div class="win-actions">
+        <button class="primary-btn" id="rematchBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 2.2 5.9M3 5v6h6"/></svg>
+          Реванш
+        </button>
+        <button class="ghost-btn" id="winCloseBtn" type="button" data-close>К протоколу</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  'use strict';
+
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  const settings = {
+    names: ['Искры', 'Волны'],
+    tables: [5, 6, 7, 8, 9],
+    time: 20,
+    target: 6,
+    sound: true
+  };
+
+  let matchCounter = 1;
+  let state = null;
+  let recentQuestions = [];
+  let tickInterval = null;
+  let nextTimer = null;
+  let countdownInterval = null;
+  let toastTimer = null;
+  let audioCtx = null;
+
+  const RING_LENGTH = 163.4;
+  const FLAME_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2S7 8.7 7 13.5a5 5 0 0 0 10 0c0-2-1-3.8-2.2-5.3-.3 2-1.1 3.2-2.3 4 1.4-3.6 1.9-6.8 1-10.2Z"/></svg>';
+  const EMPTY_LOG = '<div class="log-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16H7zM4 8h3M4 12h3M4 16h3M17 8h3M17 12h3M17 16h3"/></svg><span>Здесь появятся раунды, ответы команд и направление рывка.</span></div>';
+
+  const els = {
+    soundBtn: $('#soundBtn'),
+    newMatchBtn: $('#newMatchBtn'),
+    targetLabels: $$('[data-target-label]'),
+    matchNo: $('#matchNo'),
+    roundLabel: $('#roundLabel'),
+    nameHeads: [$('#nameHead0'), $('#nameHead1')],
+    scoreHeads: [$('#scoreHead0'), $('#scoreHead1')],
+    streakHeads: [$('#streakHead0'), $('#streakHead1')],
+    phasePill: $('#phasePill'),
+    phaseText: $('#phaseText'),
+    timerRing: $('#timerRing'),
+    timerProgress: $('#timerProgress'),
+    timerText: $('#timerText'),
+    timerUnit: $('#timerUnit'),
+    centerTitle: $('#centerTitle'),
+    centerSub: $('#centerSub'),
+    startBtn: $('#startBtn'),
+    startBtnText: $('#startBtnText'),
+    arena: $('#arena'),
+    arenaStage: $('#arenaStage'),
+    arenaCaption: $('#arenaCaption'),
+    tugSvg: $('#tugSvg'),
+    knotMove: $('#knotMove'),
+    progressLine: $('#progressLine'),
+    fieldTicks: $('#fieldTicks'),
+    leftGoalText: $('#leftGoalText'),
+    rightGoalText: $('#rightGoalText'),
+    arenaNames: [$('#arenaName0'), $('#arenaName1')],
+    legendNames: [$('#legendName0'), $('#legendName1')],
+    pauseBtn: $('#pauseBtn'),
+    pauseBtnWide: $('#pauseBtnWide'),
+    pauseBtnText: $('#pauseBtnText'),
+    pauseCurtain: $('#pauseCurtain'),
+    answerCards: [$('#answerCard0'), $('#answerCard1')],
+    cardNames: [$('#cardName0'), $('#cardName1')],
+    cardStatuses: [$('#cardStatus0'), $('#cardStatus1')],
+    expressions: [$('#expression0'), $('#expression1')],
+    answerDisplays: [$('#answerDisplay0'), $('#answerDisplay1')],
+    feedbacks: [$('#feedback0'), $('#feedback1')],
+    keypads: [$('#keypad0'), $('#keypad1')],
+    roundLog: $('#roundLog'),
+    protocolMeta: $('#protocolMeta'),
+    statCorrect: [$('#statCorrect0'), $('#statCorrect1')],
+    statErrors: [$('#statErrors0'), $('#statErrors1')],
+    statBest: [$('#statBest0'), $('#statBest1')],
+    statTime: [$('#statTime0'), $('#statTime1')],
+    rulesModal: $('#rulesModal'),
+    settingsModal: $('#settingsModal'),
+    settingsForm: $('#settingsForm'),
+    applySettings: $('#applySettings'),
+    inputName0: $('#inputName0'),
+    inputName1: $('#inputName1'),
+    tablePicks: $$('.table-pick'),
+    timeSeg: $('#timeSeg'),
+    targetSeg: $('#targetSeg'),
+    settingSound: $('#settingSound'),
+    settingsError: $('#settingsError'),
+    rulesStart: $('#rulesStart'),
+    winModal: $('#winModal'),
+    winCard: $('#winCard'),
+    winTeamName: $('#winTeamName'),
+    winSub: $('#winSub'),
+    winName0: $('#winName0'),
+    winName1: $('#winName1'),
+    winScore0: $('#winScore0'),
+    winScore1: $('#winScore1'),
+    winPull: $('#winPull'),
+    winRounds: $('#winRounds'),
+    winBest: $('#winBest'),
+    winAvg: $('#winAvg'),
+    winCloseBtn: $('#winCloseBtn'),
+    rematchBtn: $('#rematchBtn'),
+    confetti: $('#winConfetti'),
+    toast: $('#toast')
+  };
+
+  /* ---------- utilities ---------- */
+  function pad(n){ return String(n).padStart(2, '0'); }
+  function clamp(n, min, max){ return Math.min(max, Math.max(min, n)); }
+  function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+  function pullWord(n){
+    const abs = Math.abs(n) % 100;
+    const last = abs % 10;
+    if (abs > 10 && abs < 20) return 'рывков';
+    if (last === 1) return 'рывок';
+    if (last >= 2 && last <= 4) return 'рывка';
+    return 'рывков';
+  }
+  function roundTime(n){
+    if (!n) return '—';
+    return n.toFixed(1).replace('.', ',');
+  }
+  function averageTime(team){
+    return team.timeCount ? team.timeSum / team.timeCount : null;
+  }
+
+  /* ---------- audio ---------- */
+  function ensureAudio(){
+    if (!settings.sound) return null;
+    try {
+      if (!audioCtx) {
+        const Audio = window.AudioContext || window.webkitAudioContext;
+        if (!Audio) return null;
+        audioCtx = new Audio();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function playSound(kind){
+    if (!settings.sound) return;
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    const start = ctx.currentTime + 0.01;
+
+    const tone = (freq, delay, duration, type = 'sine', volume = 0.045) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, start + delay);
+      gain.gain.setValueAtTime(0.0001, start + delay);
+      gain.gain.exponentialRampToValueAtTime(volume, start + delay + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + delay + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start + delay);
+      osc.stop(start + delay + duration + 0.03);
+    };
+
+    if (kind === 'key') { tone(510, 0, 0.05, 'triangle', 0.022); return; }
+    if (kind === 'submit') { tone(620, 0, 0.06, 'triangle', 0.03); tone(820, 0.055, 0.06, 'sine', 0.025); return; }
+    if (kind === 'correct') { tone(659.25, 0, 0.12, 'sine', 0.055); tone(880, 0.1, 0.15, 'sine', 0.05); tone(1046.5, 0.21, 0.2, 'sine', 0.04); return; }
+    if (kind === 'wrong') { tone(207.65, 0, 0.15, 'sawtooth', 0.027); tone(164.81, 0.13, 0.22, 'sawtooth', 0.023); return; }
+    if (kind === 'pull') { tone(330, 0, 0.08, 'triangle', 0.035); tone(247, 0.08, 0.16, 'triangle', 0.025); return; }
+    if (kind === 'start') { tone(392, 0, 0.1, 'triangle', 0.04); tone(523.25, 0.11, 0.14, 'triangle', 0.04); return; }
+    if (kind === 'round') { tone(440, 0, 0.09, 'triangle', 0.03); tone(554.37, 0.09, 0.12, 'triangle', 0.03); return; }
+    if (kind === 'count') { tone(440, 0, 0.07, 'sine', 0.035); return; }
+    if (kind === 'pause') { tone(300, 0, 0.09, 'sine', 0.03); tone(240, 0.08, 0.12, 'sine', 0.025); return; }
+    if (kind === 'win') {
+      [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq, i) => tone(freq, i * 0.1, 0.26, 'triangle', 0.042));
+    }
+  }
+
+  /* ---------- question and state ---------- */
+  function makeQuestion(){
+    const tables = settings.tables.length ? settings.tables : [5, 6, 7, 8, 9];
+    let a = pick(tables);
+    let b = 2 + Math.floor(Math.random() * 8);
+    let key = a + 'x' + b;
+    let guard = 0;
+    while (recentQuestions.includes(key) && guard < 30) {
+      a = pick(tables);
+      b = 2 + Math.floor(Math.random() * 8);
+      key = a + 'x' + b;
+      guard += 1;
+    }
+    recentQuestions.push(key);
+    if (recentQuestions.length > 5) recentQuestions.shift();
+    return { a, b, answer: a * b };
+  }
+
+  function makeTeam(name){
+    return { name, correct: 0, errors: 0, streak: 0, best: 0, timeSum: 0, timeCount: 0 };
+  }
+
+  function createState(){
+    return {
+      phase: 'ready',
+      matchNo: matchCounter,
+      round: 0,
+      question: makeQuestion(),
+      teams: [makeTeam(settings.names[0]), makeTeam(settings.names[1])],
+      tug: 0,
+      winner: null,
+      lastResult: null,
+      message: '',
+      log: [],
+      inputs: ['', ''],
+      submitted: [false, false],
+      answers: [null, null],
+      times: [null, null],
+      submittedAt: [null, null],
+      timeLeft: settings.time,
+      timerStart: 0,
+      timerEnd: 0,
+      activeTeam: 0,
+      countdownValue: 3
+    };
+  }
+
+  function clearAllTimers(){
+    if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
+    if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+    if (nextTimer) { clearTimeout(nextTimer); nextTimer = null; }
+  }
+
+  function resetMatch(options){
+    const opts = options || {};
+    clearAllTimers();
+    if (opts.increment) matchCounter += 1;
+    recentQuestions = [];
+    closeModal(els.winModal);
+    els.confetti.innerHTML = '';
+    state = createState();
+    render();
+  }
+
+  /* ---------- rendering ---------- */
+  function render(){
+    if (!state) return;
+    const s = state;
+    els.matchNo.textContent = pad(s.matchNo);
+    els.roundLabel.textContent = s.round ? 'раунд ' + pad(s.round) : 'раунд —';
+    els.targetLabels.forEach(el => { el.textContent = settings.target; });
+
+    s.teams.forEach((team, i) => {
+      els.nameHeads[i].textContent = team.name;
+      els.cardNames[i].textContent = team.name;
+      els.arenaNames[i].textContent = team.name;
+      els.legendNames[i].textContent = team.name;
+      els.scoreHeads[i].textContent = team.correct;
+      els.streakHeads[i].classList.toggle('has-streak', team.streak > 0);
+      els.streakHeads[i].innerHTML = FLAME_ICON + 'серия ' + (team.streak > 0 ? '×' + team.streak : '—');
+      els.answerCards[i].classList.toggle('is-active', s.activeTeam === i && s.phase === 'answering');
+      els.keypads[i].setAttribute('aria-label', 'Ввод ответа командой ' + team.name);
+    });
+
+    renderPhasePill();
+    renderCenter();
+    renderExpressions();
+    renderAnswerDisplays();
+    renderFeedbacks();
+    renderTeamStatuses();
+    renderKeypads();
+    renderArena();
+    renderTicks();
+    renderStats();
+    renderLog();
+    updateTimerUI();
+    renderPauseState();
+    syncSoundButton();
+  }
+
+  function renderPhasePill(){
+    const map = {
+      ready: ['матч готов', ''],
+      countdown: ['на старт', 'live'],
+      answering: ['раунд идёт', 'live'],
+      paused: ['пауза', 'paused'],
+      locked: ['оба ответили', 'checking'],
+      reveal: ['проверка', 'checking'],
+      finished: ['финиш', '']
+    };
+    const item = map[state.phase] || map.ready;
+    els.phaseText.textContent = item[0];
+    els.phasePill.className = 'phase-pill ' + item[1];
+  }
+
+  function renderCenter(){
+    const s = state;
+    const winnerName = s.winner !== null ? s.teams[s.winner].name : '';
+    let title = 'Всё готово?';
+    let sub = 'Две команды. Одна таблица.';
+    let showStart = false;
+    let startLabel = 'Начать матч';
+
+    if (s.phase === 'ready') {
+      title = 'Всё готово?';
+      sub = 'Нажмите старт — команды начнут вместе.';
+      showStart = true;
+    } else if (s.phase === 'countdown') {
+      title = 'Приготовиться…';
+      sub = 'Раунд 1 через ' + s.countdownValue + '…';
+    } else if (s.phase === 'answering') {
+      title = s.tug === 0 ? 'Кто быстрее?' : '«' + s.teams[s.tug > 0 ? 0 : 1].name + '» впереди';
+      sub = s.submitted[0] && s.submitted[1] ? 'Сверяем ответы…' : 'Оба вводят ответ одновременно';
+    } else if (s.phase === 'paused') {
+      title = 'Матч на паузе';
+      sub = 'Таймер остановлен. Продолжите, когда будете готовы.';
+    } else if (s.phase === 'locked') {
+      title = 'Проверяем…';
+      sub = 'Сравниваем ответы и скорость.';
+    } else if (s.phase === 'reveal') {
+      const r = s.lastResult;
+      title = r && r.delta !== 0 ? 'Есть движение!' : 'Без движения';
+      if (r) {
+        if (r.bothCorrect) title = 'Оба верно — решает скорость!';
+        else if (r.correct[0] || r.correct[1]) title = 'Верный ответ — рывок!';
+        else title = 'Правильный ответ важнее скорости';
+      }
+      sub = 'Следующий раунд уже готовится.';
+    } else if (s.phase === 'finished') {
+      title = 'Матч завершён';
+      sub = winnerName ? '«' + winnerName + '» забирают канат.' : 'Смотрите протокол матча.';
+      showStart = true;
+      startLabel = 'Реванш';
+    }
+
+    els.centerTitle.textContent = title;
+    els.centerSub.textContent = sub;
+    els.startBtn.hidden = !showStart;
+    els.startBtnText.textContent = startLabel;
+  }
+
+  function renderExpressions(){
+    const q = state.question;
+    const expr = q ? q.a + ' <span class="times">×</span> ' + q.b : '? <span class="times">×</span> ?';
+    els.expressions.forEach(el => { el.innerHTML = expr; });
+  }
+
+  function renderAnswerDisplays(){
+    const s = state;
+    s.teams.forEach((team, i) => {
+      const display = els.answerDisplays[i];
+      let text = '?';
+      let classes = 'answer-slot';
+      if (s.phase === 'answering' || s.phase === 'paused') {
+        text = s.inputs[i] || '?';
+        if (s.inputs[i]) classes += ' is-filled';
+      } else if (s.phase === 'countdown' || s.phase === 'ready') {
+        text = '?';
+      } else if (s.phase === 'locked') {
+        text = s.answers[i] !== null ? String(s.answers[i]) : '—';
+        classes += ' is-filled';
+      } else if (s.phase === 'reveal' && s.lastResult) {
+        text = s.answers[i] !== null ? String(s.answers[i]) : '—';
+        classes += s.lastResult.correct[i] ? ' good' : ' bad';
+      } else if (s.phase === 'finished') {
+        const r = s.lastResult;
+        text = s.answers[i] !== null ? String(s.answers[i]) : '—';
+        if (r) classes += r.correct[i] ? ' good' : ' bad';
+      }
+      display.textContent = text;
+      display.className = classes;
+    });
+  }
+
+  function renderFeedbacks(){
+    const s = state;
+    const r = s.lastResult;
+    s.teams.forEach((team, i) => {
+      let html = '';
+      if (s.phase === 'ready') {
+        html = 'Нажмите <strong>«Начать матч»</strong> в центре табло.';
+      } else if (s.phase === 'countdown') {
+        html = 'Приготовьтесь: пример появится через мгновение.';
+      } else if (s.phase === 'answering') {
+        if (s.submitted[i]) html = 'Ответ принят. Ждём соперника…';
+        else if (s.activeTeam === i) html = 'Введите ответ и нажмите <strong>Enter</strong> или ✓.';
+        else html = 'Введите ответ на своей клавиатуре.';
+      } else if (s.phase === 'paused') {
+        html = 'Таймер остановлен. Продолжите, когда команды готовы.';
+      } else if (s.phase === 'locked') {
+        html = 'Сверяем ответы команд…';
+      } else if (s.phase === 'reveal' || s.phase === 'finished') {
+        if (!r) {
+          html = s.phase === 'finished' ? 'Матч завершён.' : 'Следующий пример уже готовится.';
+        } else if (r.correct[i]) {
+          if (r.bothCorrect && r.faster !== i) html = 'Верно! Но соперник ответил <strong>быстрее</strong>.';
+          else html = 'Верно! <span class="green">Рывок в вашу сторону.</span>';
+        } else {
+          html = (s.answers[i] !== null ? 'Ошибка. ' : 'Нет ответа. ') + 'Верный ответ — <strong>' + r.answer + '</strong>.';
+        }
+      }
+      els.feedbacks[i].innerHTML = html;
+    });
+  }
+
+  function renderTeamStatuses(){
+    const s = state;
+    s.teams.forEach((team, i) => {
+      let text = 'ждёт старта';
+      let chip = '';
+      if (s.phase === 'countdown') { text = 'приготовиться'; chip = 'chip-neutral'; }
+      else if (s.phase === 'answering') {
+        if (s.submitted[i]) { text = 'ответ принят'; chip = 'chip-neutral'; }
+        else { text = 'вводит ответ'; chip = 'chip-active'; }
+      } else if (s.phase === 'paused') { text = 'пауза'; chip = 'chip-neutral'; }
+      else if (s.phase === 'locked') { text = 'проверяем'; chip = 'chip-neutral'; }
+      else if (s.phase === 'finished') {
+        if (s.winner === i) { text = 'победа'; chip = 'chip-good'; }
+        else { text = 'матч окончен'; chip = 'chip-bad'; }
+      } else if (s.phase === 'reveal' && s.lastResult) {
+        if (s.lastResult.correct[i]) { text = 'верно'; chip = 'chip-good'; }
+        else { text = 'ошибка'; chip = 'chip-bad'; }
+      }
+      els.cardStatuses[i].textContent = text;
+      els.cardStatuses[i].className = 'status-chip ' + chip;
+    });
+  }
+
+  function renderKeypads(){
+    const s = state;
+    s.teams.forEach((team, i) => {
+      const disabled = s.phase !== 'answering' || s.submitted[i];
+      $$('button', els.keypads[i]).forEach(btn => { btn.disabled = disabled; });
+    });
+  }
+
+  function renderArena(){
+    const s = state;
+    const unit = 200 / settings.target;
+    const shift = -s.tug * unit;
+    const leader = s.tug > 0 ? 0 : s.tug < 0 ? 1 : null;
+    els.knotMove.style.transform = 'translateX(' + shift + 'px)';
+    els.progressLine.setAttribute('x2', String(700 - s.tug * unit));
+    els.progressLine.style.opacity = leader === null ? '0' : '1';
+    els.progressLine.setAttribute('stroke', leader === 0 ? '#EE5F2B' : '#177E70');
+    els.arena.classList.toggle('is-lead-a', leader === 0);
+    els.arena.classList.toggle('is-lead-b', leader === 1);
+    els.arena.style.setProperty('--lead', leader === 0 ? 'var(--orange)' : leader === 1 ? 'var(--teal)' : 'var(--yellow)');
+    els.leftGoalText.textContent = String(settings.target);
+    els.rightGoalText.textContent = String(settings.target);
+
+    let caption = 'Канат у центральной линии';
+    if (s.phase === 'ready') caption = 'Канат у центральной линии · ждём старта';
+    else if (s.phase === 'countdown') caption = 'Приготовиться… канат натянут';
+    else if (s.phase === 'paused') caption = 'Пауза — таймер остановлен';
+    else if (s.phase === 'locked') caption = 'Проверяем ответы обеих команд…';
+    else if (s.phase === 'reveal' || s.phase === 'finished') caption = s.message || 'Канат у центральной линии';
+    else if (s.phase === 'answering') {
+      if (leader === null) caption = 'Канат у центральной линии — равный счёт';
+      else {
+        const amount = Math.abs(s.tug);
+        caption = '«' + s.teams[leader].name + '» тянет: ' + amount + ' ' + pullWord(amount) + ' из ' + settings.target;
+      }
+    }
+    if (s.phase === 'finished' && s.winner !== null) caption = '«' + s.teams[s.winner].name + '» удерживают канат!';
+    els.arenaCaption.textContent = caption;
+    els.tugSvg.setAttribute('aria-label', 'Перетягивание каната. ' + caption);
+  }
+
+  function renderTicks(){
+    const unit = 200 / settings.target;
+    let html = '';
+    for (let i = 1; i <= settings.target; i += 1) {
+      const major = i === settings.target ? ' is-major' : '';
+      [-1, 1].forEach(sign => {
+        const x = 700 + sign * i * unit;
+        html += '<line class="field-tick' + major + '" x1="' + x + '" y1="187" x2="' + x + '" y2="197"></line>';
+      });
+    }
+    els.fieldTicks.innerHTML = html;
+  }
+
+  function renderStats(){
+    const s = state;
+    s.teams.forEach((team, i) => {
+      els.statCorrect[i].textContent = team.correct;
+      els.statErrors[i].textContent = team.errors;
+      els.statBest[i].textContent = team.best;
+      const avg = averageTime(team);
+      els.statTime[i].textContent = avg === null ? '—' : roundTime(avg);
+    });
+    els.protocolMeta.textContent = 'раундов: ' + s.round;
+  }
+
+  function renderLog(){
+    if (!state.log.length) {
+      els.roundLog.innerHTML = EMPTY_LOG;
+      return;
+    }
+    const items = state.log.slice(0, 12).map((entry, index) => {
+      const mark0 = entry.correct[0] ? '✓' : '✕';
+      const mark1 = entry.correct[1] ? '✓' : '✕';
+      const deltaText = entry.delta === 0 ? '0' : (entry.delta > 0 ? '←' : '→') + Math.abs(entry.delta);
+      const deltaClass = entry.delta > 0 ? 'is-a' : entry.delta < 0 ? 'is-b' : 'is-zero';
+      return '<div class="log-item' + (index === 0 ? ' is-latest' : '') + '" title="Раунд ' + entry.round + ': ' + entry.a + ' × ' + entry.b + ' = ' + entry.answer + '">' +
+        '<span class="log-round">Р' + entry.round + '</span>' +
+        '<span class="log-expr">' + entry.a + '×' + entry.b + '</span>' +
+        '<span class="log-mark ' + (entry.correct[0] ? 'ok' : 'bad') + ' is-a">' + mark0 + '</span>' +
+        '<span class="log-mark ' + (entry.correct[1] ? 'ok' : 'bad') + ' is-b">' + mark1 + '</span>' +
+        '<span class="log-delta ' + deltaClass + '">' + deltaText + '</span>' +
+      '</div>';
+    }).join('');
+    els.roundLog.innerHTML = items;
+  }
+
+  function updateTimerUI(){
+    const s = state;
+    if (!s) return;
+    let value = settings.time;
+    let unit = 'сек';
+    let fraction = 1;
+    let critical = false;
+    let paused = false;
+
+    if (s.phase === 'ready') {
+      value = settings.time;
+      fraction = 1;
+    } else if (s.phase === 'countdown') {
+      value = s.countdownValue;
+      unit = 'старт';
+      fraction = clamp(s.countdownValue / 3, 0, 1);
+    } else if (s.phase === 'answering' || s.phase === 'paused' || s.phase === 'locked') {
+      value = Math.ceil(s.timeLeft);
+      unit = s.phase === 'paused' ? 'пауза' : s.phase === 'locked' ? 'ждём' : 'сек';
+      fraction = clamp(s.timeLeft / settings.time, 0, 1);
+      critical = s.phase === 'answering' && s.timeLeft <= 5;
+      paused = s.phase === 'paused';
+    } else if (s.phase === 'reveal') {
+      value = '✓';
+      unit = 'проверка';
+      fraction = clamp(s.timeLeft / settings.time, 0, 1);
+    } else {
+      value = '—';
+      unit = 'финиш';
+      fraction = 0;
+    }
+
+    els.timerText.textContent = String(value);
+    els.timerUnit.textContent = unit;
+    els.timerProgress.style.strokeDashoffset = String(RING_LENGTH * (1 - fraction));
+    els.timerRing.classList.toggle('is-critical', critical);
+    els.timerRing.classList.toggle('is-paused', paused);
+    els.timerRing.setAttribute('aria-label', 'Таймер: ' + value + ' ' + unit);
+  }
+
+  function renderPauseState(){
+    const phase = state.phase;
+    const canPause = phase === 'answering' || phase === 'paused';
+    [els.pauseBtn, els.pauseBtnWide].forEach(btn => {
+      if (btn) btn.disabled = !canPause;
+    });
+    els.pauseBtnText.textContent = phase === 'paused' ? 'Продолжить' : 'Пауза';
+    els.pauseBtnWide.textContent = phase === 'paused' ? 'продолжить матч' : 'остановить таймер';
+    els.pauseCurtain.hidden = phase !== 'paused';
+  }
+
+  function syncSoundButton(){
+    els.soundBtn.classList.toggle('is-muted', !settings.sound);
+    els.soundBtn.setAttribute('aria-pressed', settings.sound ? 'true' : 'false');
+    els.soundBtn.setAttribute('aria-label', settings.sound ? 'Выключить звук' : 'Включить звук');
+    els.soundBtn.title = settings.sound ? 'Звук включён' : 'Звук выключен';
+  }
+
+  /* ---------- game flow ---------- */
+  function startCountdown(){
+    if (!state || (state.phase !== 'ready' && state.phase !== 'finished')) return;
+    if (state.phase === 'finished') {
+      resetMatch({ increment: true });
+    }
+    clearAllTimers();
+    state.phase = 'countdown';
+    state.countdownValue = 3;
+    state.timeLeft = settings.time;
+    state.inputs = ['', ''];
+    state.submitted = [false, false];
+    state.answers = [null, null];
+    state.times = [null, null];
+    state.submittedAt = [null, null];
+    state.lastResult = null;
+    state.message = '';
+    state.activeTeam = 0;
+    render();
+    playSound('start');
+    countdownInterval = setInterval(() => {
+      if (!state || state.phase !== 'countdown') {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+        return;
+      }
+      state.countdownValue -= 1;
+      if (state.countdownValue <= 0) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+        beginRound(false);
+      } else {
+        render();
+        playSound('count');
+      }
+    }, 680);
+  }
+
+  function beginRound(newQuestion){
+    if (!state) return;
+    if ($$('.modal:not([hidden])').length) {
+      if (nextTimer) clearTimeout(nextTimer);
+      nextTimer = setTimeout(() => beginRound(newQuestion), 450);
+      return;
+    }
+    if (newQuestion || !state.question) state.question = makeQuestion();
+    state.phase = 'answering';
+    state.round += 1;
+    state.inputs = ['', ''];
+    state.submitted = [false, false];
+    state.answers = [null, null];
+    state.times = [null, null];
+    state.submittedAt = [null, null];
+    state.lastResult = null;
+    state.message = '';
+    state.timeLeft = settings.time;
+    state.timerStart = performance.now();
+    state.timerEnd = state.timerStart + settings.time * 1000;
+    render();
+    playSound('round');
+    if (tickInterval) clearInterval(tickInterval);
+    tickInterval = setInterval(tick, 100);
+  }
+
+  function tick(){
+    if (!state || state.phase !== 'answering') return;
+    state.timeLeft = Math.max(0, (state.timerEnd - performance.now()) / 1000);
+    updateTimerUI();
+    if (state.timeLeft <= 0) resolveRound('timeout');
+  }
+
+  function togglePause(){
+    if (!state) return;
+    if (state.phase === 'answering') {
+      state.timeLeft = Math.max(0, (state.timerEnd - performance.now()) / 1000);
+      if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
+      state.phase = 'paused';
+      render();
+      playSound('pause');
+    } else if (state.phase === 'paused') {
+      state.timerStart = performance.now() - (settings.time - state.timeLeft) * 1000;
+      state.timerEnd = performance.now() + state.timeLeft * 1000;
+      state.phase = 'answering';
+      render();
+      playSound('count');
+      if (tickInterval) clearInterval(tickInterval);
+      tickInterval = setInterval(tick, 100);
+    }
+  }
+
+  function selectTeam(index){
+    if (!state) return;
+    state.activeTeam = index;
+    els.answerCards.forEach((card, i) => card.classList.toggle('is-active', i === index));
+    if (state.phase === 'answering') renderFeedbacks();
+  }
+
+  function appendKey(team, key){
+    if (!state || state.phase !== 'answering' || state.submitted[team]) return;
+    selectTeam(team);
+    if (key === 'ok') { submitAnswer(team); return; }
+    if (key === 'del') {
+      state.inputs[team] = state.inputs[team].slice(0, -1);
+      render();
+      playSound('key');
+      return;
+    }
+    if (!/^[0-9]$/.test(key)) return;
+    let next = state.inputs[team];
+    if (next === '0') next = '';
+    next = (next + key).slice(0, 3);
+    state.inputs[team] = next;
+    render();
+    playSound('key');
+  }
+
+  function submitAnswer(team){
+    if (!state || state.phase !== 'answering' || state.submitted[team]) return;
+    if (performance.now() > state.timerEnd) {
+      resolveRound('timeout');
+      return;
+    }
+    if (!state.inputs[team]) {
+      showToast('Сначала введите ответ на клавиатуре команды.');
+      els.answerCards[team].classList.remove('is-wrong');
+      void els.answerCards[team].offsetWidth;
+      els.answerCards[team].classList.add('is-wrong');
+      playSound('wrong');
+      return;
+    }
+    state.submitted[team] = true;
+    state.answers[team] = Number(state.inputs[team]);
+    const elapsed = clamp((performance.now() - state.timerStart) / 1000, 0.1, settings.time);
+    state.times[team] = elapsed;
+    state.submittedAt[team] = performance.now();
+    playSound('submit');
+
+    if (state.submitted[0] && state.submitted[1]) {
+      if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
+      state.phase = 'locked';
+      render();
+      if (nextTimer) clearTimeout(nextTimer);
+      nextTimer = setTimeout(() => resolveRound('both'), 520);
+    } else {
+      render();
+    }
+  }
+
+  function resolveRound(reason){
+    if (!state || (state.phase !== 'answering' && state.phase !== 'locked')) return;
+    if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
+    if (nextTimer) { clearTimeout(nextTimer); nextTimer = null; }
+
+    const s = state;
+    const q = s.question;
+    const correct = [
+      s.submitted[0] && s.answers[0] === q.answer,
+      s.submitted[1] && s.answers[1] === q.answer
+    ];
+    const bothCorrect = correct[0] && correct[1];
+    let delta = 0;
+    let faster = null;
+
+    s.teams.forEach((team, i) => {
+      if (correct[i]) {
+        team.correct += 1;
+        team.streak += 1;
+        team.best = Math.max(team.best, team.streak);
+        if (s.times[i] !== null) {
+          team.timeSum += s.times[i];
+          team.timeCount += 1;
+        }
+      } else {
+        team.errors += 1;
+        team.streak = 0;
+      }
+    });
+
+    if (bothCorrect) {
+      faster = (s.submittedAt[1] && (!s.submittedAt[0] || s.submittedAt[1] < s.submittedAt[0])) ? 1 : 0;
+      delta = faster === 0 ? 1 : -1;
+      s.message = 'Оба верно! «' + s.teams[faster].name + '» ответили быстрее — рывок в их сторону.';
+    } else if (correct[0]) {
+      delta = 2;
+      s.message = '«' + s.teams[0].name + '» отвечают верно и получают +2 рывка.';
+    } else if (correct[1]) {
+      delta = -2;
+      s.message = '«' + s.teams[1].name + '» отвечают верно и получают +2 рывка.';
+    } else {
+      delta = 0;
+      const answeredCount = [0, 1].filter(i => s.submitted[i]).length;
+      if (answeredCount === 0) s.message = 'Время вышло: ответов нет — канат остаётся на месте.';
+      else if (answeredCount === 1) s.message = 'Один ответ неверный, второй не поступил — канат на месте.';
+      else s.message = 'Оба ответа неверны — канат остаётся на месте.';
+    }
+
+    if (delta !== 0) s.tug = clamp(s.tug + delta, -settings.target, settings.target);
+
+    s.lastResult = {
+      correct,
+      bothCorrect,
+      faster,
+      delta,
+      answer: q.answer,
+      reason: reason || 'both'
+    };
+    s.log.unshift({
+      round: s.round,
+      a: q.a,
+      b: q.b,
+      answer: q.answer,
+      correct,
+      delta,
+      times: s.times.slice()
+    });
+    s.phase = 'reveal';
+    render();
+    animateResolution(correct, delta);
+    playSound(correct[0] || correct[1] ? 'correct' : 'wrong');
+    if (delta !== 0) setTimeout(() => playSound('pull'), 240);
+
+    if (Math.abs(s.tug) >= settings.target) {
+      s.winner = s.tug > 0 ? 0 : 1;
+      nextTimer = setTimeout(finishMatch, 1100);
+    } else {
+      nextTimer = setTimeout(() => beginRound(true), 2650);
+    }
+  }
+
+  function animateResolution(correct, delta){
+    state.teams.forEach((team, i) => {
+      const card = els.answerCards[i];
+      card.classList.remove('card-correct-flash', 'card-wrong-flash', 'is-wrong');
+      void card.offsetWidth;
+      card.classList.add(correct[i] ? 'card-correct-flash' : 'card-wrong-flash');
+      if (correct[i]) {
+        const score = els.scoreHeads[i];
+        score.classList.remove('score-bump');
+        void score.offsetWidth;
+        score.classList.add('score-bump');
+      }
+    });
+    showBurst(delta);
+  }
+
+  function showBurst(delta){
+    if (!els.arenaStage) return;
+    const el = document.createElement('div');
+    const amount = Math.abs(delta);
+    el.className = 'pull-burst ' + (delta === 0 ? 'is-zero' : delta > 0 ? 'is-a' : 'is-b');
+    el.innerHTML = delta === 0 ? 'канат на месте' : (delta > 0 ? '+' : '−') + amount + '<small>' + pullWord(amount) + '</small>';
+    const shiftPercent = settings.target ? (state.tug / settings.target) * 13 : 0;
+    el.style.left = (50 - shiftPercent) + '%';
+    els.arenaStage.appendChild(el);
+    setTimeout(() => el.remove(), 1500);
+  }
+
+  function finishMatch(){
+    if (!state) return;
+    if ($$('.modal:not([hidden])').length) {
+      if (nextTimer) clearTimeout(nextTimer);
+      nextTimer = setTimeout(finishMatch, 450);
+      return;
+    }
+    if (state.winner === null) state.winner = state.tug >= 0 ? 0 : 1;
+    clearAllTimers();
+    state.phase = 'finished';
+    render();
+    showWinModal();
+    playSound('win');
+  }
+
+  function showWinModal(){
+    const s = state;
+    const winnerIndex = s.winner === null ? 0 : s.winner;
+    const team = s.teams[winnerIndex];
+    const loser = s.teams[1 - winnerIndex];
+    els.winCard.dataset.winner = String(winnerIndex);
+    els.winTeamName.textContent = '«' + team.name + '»';
+    els.winSub.textContent = '«' + loser.name + '» боролись до конца. Точность и скорость принесли победу!';
+    els.winName0.textContent = s.teams[0].name;
+    els.winName1.textContent = s.teams[1].name;
+    els.winScore0.textContent = String(s.teams[0].correct);
+    els.winScore1.textContent = String(s.teams[1].correct);
+    els.winPull.textContent = Math.abs(s.tug) + ' из ' + settings.target;
+    els.winRounds.textContent = String(s.round);
+    els.winBest.textContent = '×' + team.best;
+    const avg = averageTime(team);
+    els.winAvg.textContent = avg === null ? '—' : roundTime(avg) + ' с';
+    spawnConfetti(winnerIndex);
+    openModal(els.winModal);
+  }
+
+  function spawnConfetti(winnerIndex){
+    els.confetti.innerHTML = '';
+    const colors = winnerIndex === 0
+      ? ['#EE5F2B', '#F6C445', '#FFFCF5', '#C64719', '#177E70']
+      : ['#177E70', '#F6C445', '#FFFCF5', '#0D5D52', '#EE5F2B'];
+    for (let i = 0; i < 38; i += 1) {
+      const bit = document.createElement('i');
+      const size = 5 + Math.random() * 7;
+      bit.style.left = (Math.random() * 100) + '%';
+      bit.style.width = size + 'px';
+      bit.style.height = (size * (0.7 + Math.random())) + 'px';
+      bit.style.background = pick(colors);
+      bit.style.borderRadius = Math.random() > 0.55 ? '50%' : '2px';
+      bit.style.animationDelay = (Math.random() * 0.65) + 's';
+      bit.style.animationDuration = (1.7 + Math.random() * 1.4) + 's';
+      bit.style.transform = 'rotate(' + Math.floor(Math.random() * 180) + 'deg)';
+      els.confetti.appendChild(bit);
+    }
+  }
+
+  function handleStart(){
+    if (!state) return;
+    if (state.phase === 'finished') {
+      resetMatch({ increment: true });
+    }
+    if (state.phase === 'ready') startCountdown();
+  }
+
+  function showToast(message){
+    els.toast.textContent = message;
+    els.toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => els.toast.classList.remove('show'), 2800);
+  }
+
+  /* ---------- modals and settings ---------- */
+  function openModal(modal){
+    if (!modal) return;
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+    const focusTarget = modal.querySelector('.close-btn, button, input');
+    setTimeout(() => {
+      if (focusTarget && !modal.hidden) {
+        try { focusTarget.focus({ preventScroll: true }); } catch (err) { focusTarget.focus(); }
+      }
+    }, 40);
+  }
+
+  function closeModal(modal){
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    if (!$$('.modal:not([hidden])').length) document.body.classList.remove('modal-open');
+    if (modal === els.winModal) els.confetti.innerHTML = '';
+  }
+
+  function closeAllModals(){
+    [els.rulesModal, els.settingsModal, els.winModal].forEach(modal => closeModal(modal));
+  }
+
+  function pauseForModal(){
+    if (state && state.phase === 'answering') togglePause();
+  }
+
+  function populateSettings(){
+    els.inputName0.value = settings.names[0];
+    els.inputName1.value = settings.names[1];
+    els.tablePicks.forEach(btn => {
+      const selected = settings.tables.includes(Number(btn.dataset.table));
+      btn.classList.toggle('is-active', selected);
+      btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    });
+    $$('.seg-btn', els.timeSeg).forEach(btn => {
+      const active = Number(btn.dataset.time) === settings.time;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    $$('.seg-btn', els.targetSeg).forEach(btn => {
+      const active = Number(btn.dataset.target) === settings.target;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    els.settingSound.checked = settings.sound;
+    els.settingsError.hidden = true;
+    els.settingsError.textContent = '';
+  }
+
+  function showSettingsError(message){
+    els.settingsError.textContent = message;
+    els.settingsError.hidden = false;
+  }
+
+  function applySettings(){
+    const selectedTables = els.tablePicks.filter(btn => btn.classList.contains('is-active')).map(btn => Number(btn.dataset.table));
+    if (!selectedTables.length) {
+      showSettingsError('Оставьте хотя бы одну таблицу умножения.');
+      return;
+    }
+    const nameA = els.inputName0.value.trim().slice(0, 18) || 'Искры';
+    const nameB = els.inputName1.value.trim().slice(0, 18) || 'Волны';
+    const activeTime = $('.seg-btn.is-active', els.timeSeg);
+    const activeTarget = $('.seg-btn.is-active', els.targetSeg);
+
+    settings.names = [nameA, nameB];
+    settings.tables = selectedTables.sort((a, b) => a - b);
+    settings.time = Number(activeTime ? activeTime.dataset.time : 20);
+    settings.target = Number(activeTarget ? activeTarget.dataset.target : 6);
+    settings.sound = els.settingSound.checked;
+
+    els.settingsError.hidden = true;
+    syncSoundButton();
+    closeModal(els.settingsModal);
+    resetMatch({ increment: true });
+    showToast('Настройки применены. Новый матч готов!');
+    playSound('round');
+  }
+
+  /* ---------- events ---------- */
+  function bindEvents(){
+    els.startBtn.addEventListener('click', handleStart);
+    els.pauseBtn.addEventListener('click', togglePause);
+    if (els.pauseBtnWide) els.pauseBtnWide.addEventListener('click', togglePause);
+
+    els.newMatchBtn.addEventListener('click', () => {
+      clearAllTimers();
+      closeAllModals();
+      resetMatch({ increment: true });
+      showToast('Новый матч готов. Нажмите «Начать матч».');
+      playSound('round');
+    });
+
+    els.soundBtn.addEventListener('click', () => {
+      settings.sound = !settings.sound;
+      syncSoundButton();
+      if (settings.sound) {
+        ensureAudio();
+        playSound('key');
+      }
+      showToast(settings.sound ? 'Звук включён.' : 'Звук выключен.');
+    });
+
+    els.keypads.forEach((keypad, team) => {
+      keypad.addEventListener('click', event => {
+        const button = event.target.closest('button[data-key]');
+        if (!button || button.disabled) return;
+        appendKey(team, button.dataset.key);
+      });
+    });
+
+    els.answerCards.forEach((card, team) => {
+      card.addEventListener('pointerdown', () => {
+        if (state.phase === 'answering') selectTeam(team);
+      });
+      card.addEventListener('focusin', () => {
+        if (state.phase === 'answering') selectTeam(team);
+      });
+    });
+
+    $$('[data-open]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.open;
+        if (target === 'settings') {
+          pauseForModal();
+          populateSettings();
+          openModal(els.settingsModal);
+        } else {
+          pauseForModal();
+          openModal(els.rulesModal);
+        }
+        playSound('key');
+      });
+    });
+
+    $$('.modal [data-close]').forEach(btn => {
+      btn.addEventListener('click', () => closeModal(btn.closest('.modal')));
+    });
+
+    $$('.table-pick').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const active = els.tablePicks.filter(item => item.classList.contains('is-active'));
+        if (btn.classList.contains('is-active') && active.length === 1) {
+          showSettingsError('Должна остаться хотя бы одна таблица.');
+          return;
+        }
+        btn.classList.toggle('is-active');
+        btn.setAttribute('aria-pressed', btn.classList.contains('is-active') ? 'true' : 'false');
+        els.settingsError.hidden = true;
+      });
+    });
+
+    [els.timeSeg, els.targetSeg].forEach(seg => {
+      if (!seg) return;
+      seg.addEventListener('click', event => {
+        const btn = event.target.closest('.seg-btn');
+        if (!btn) return;
+        $$('.seg-btn', seg).forEach(item => {
+          item.classList.toggle('is-active', item === btn);
+          item.setAttribute('aria-pressed', item === btn ? 'true' : 'false');
+        });
+      });
+    });
+
+    elementsInputsClearError();
+    els.settingsForm.addEventListener('submit', event => {
+      event.preventDefault();
+      applySettings();
+    });
+    els.applySettings.addEventListener('click', applySettings);
+
+    els.rulesStart.addEventListener('click', () => {
+      closeModal(els.rulesModal);
+      if (state.phase === 'paused') {
+        togglePause();
+      } else if (state.phase === 'ready' || state.phase === 'finished') {
+        handleStart();
+      }
+    });
+
+    els.rematchBtn.addEventListener('click', () => {
+      closeModal(els.winModal);
+      resetMatch({ increment: true });
+      startCountdown();
+    });
+
+    if (els.winCloseBtn) {
+      els.winCloseBtn.addEventListener('click', () => {
+        const protocol = $('#protocolSection');
+        if (protocol) {
+          setTimeout(() => {
+            try { protocol.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+            catch (err) { protocol.scrollIntoView(); }
+          }, 60);
+        }
+      });
+    }
+
+    document.addEventListener('keydown', event => {
+      const opened = $$('.modal:not([hidden])');
+      if (event.key === 'Escape' && opened.length) {
+        closeModal(opened[opened.length - 1]);
+        return;
+      }
+      if (opened.length) return;
+      const tag = event.target && event.target.tagName ? event.target.tagName.toLowerCase() : '';
+      const editable = tag === 'input' || tag === 'textarea' || tag === 'select' || (event.target && event.target.isContentEditable);
+      if (editable) return;
+
+      if (event.key === 'p' || event.key === 'P' || event.key === 'з' || event.key === 'З') {
+        togglePause();
+        event.preventDefault();
+        return;
+      }
+      if (event.key === ' ' && !(event.target && event.target.closest && event.target.closest('button, a, input'))) {
+        togglePause();
+        event.preventDefault();
+        return;
+      }
+      if (!state || state.phase !== 'answering') return;
+      if (event.key === 'Enter') {
+        submitAnswer(state.activeTeam);
+        event.preventDefault();
+        return;
+      }
+      if (event.key === 'Backspace') {
+        appendKey(state.activeTeam, 'del');
+        event.preventDefault();
+        return;
+      }
+      if (/^[0-9]$/.test(event.key)) {
+        appendKey(state.activeTeam, event.key);
+        event.preventDefault();
+      }
+    });
+  }
+
+  function elementsInputsClearError(){
+    [els.inputName0, els.inputName1].forEach(input => {
+      if (!input) return;
+      input.addEventListener('input', () => { els.settingsError.hidden = true; });
+    });
+  }
+
+  /* ---------- boot ---------- */
+  bindEvents();
+  syncSoundButton();
+  state = createState();
+  render();
+
+  if (state.phase === 'ready' && !state.question) {
+    state.question = makeQuestion();
+    render();
+  }
+})();
+</script>
+</body>
+</html>
